@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  frontend:
+    image: health-frontend
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    working_dir: /app
+    ports:
+      - "3000:3000"
+  backend:
+    image: health-backend
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    ports:
+      - "7777:7777"
+    environment:
+      SPRING_DATASOURCE_URL: "${SPRING_DATASOURCE_URL:-jdbc:postgresql://db:5432/health}"
+      SPRING_DATASOURCE_USERNAME: "${SPRING_DATASOURCE_USERNAME:-admin}"
+      SPRING_DATASOURCE_PASSWORD: "${SPRING_DATASOURCE_PASSWORD:-senha123}"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:alpine3.18
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: senha123
+      POSTGRES_DB: health
+    volumes:
+      - health:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d health -U admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  health:
+    external: false
