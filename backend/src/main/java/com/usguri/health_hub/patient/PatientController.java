@@ -14,7 +14,7 @@ public class PatientController {
     private final PatientService patientService;
 
     @Autowired
-    public PatientController(PatientService patientService){
+    public PatientController(PatientService patientService) {
         this.patientService = patientService;
     }
 
@@ -25,21 +25,43 @@ public class PatientController {
 
     @GetMapping("/{id}")
     public Patient getPatientById(@PathVariable Long id) {
-        Optional<Patient> pat =  this.patientService.findById(id);
-        if (pat.isPresent()){
+        Optional<Patient> pat = this.patientService.findById(id);
+        if (pat.isPresent()) {
             return pat.get();
-        }else {
+        } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "patient with id: " + id + " was not found");
         }
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Patient registerPatient(@RequestBody Patient pat){
+    public Patient registerPatient(@RequestBody Patient pat) {
         try {
             return this.patientService.createPatient(pat);
-        }catch (IllegalStateException e){
+        } catch (IllegalStateException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "email " + pat.getEmail() + " taken");
         }
+    }
+
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void removePatient(@PathVariable Long id) {
+        try {
+            this.patientService.removePatient(id);
+        } catch (IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+    }
+
+    @PatchMapping("{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Patient updatePatient(@RequestBody Patient pat) {
+        try {
+            return this.patientService.updatePatient(pat);
+        } catch (IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
     }
 }

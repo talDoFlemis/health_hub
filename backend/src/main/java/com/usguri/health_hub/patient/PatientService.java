@@ -30,10 +30,22 @@ public class PatientService {
 
     public Patient createPatient(Patient patDTO) {
         Optional<Patient> pat = this.findByEmail(patDTO.getEmail());
-        if(pat.isPresent()){
+        if (pat.isPresent()) {
             throw new IllegalStateException("email taken");
-        }else {
+        } else {
             return this.patientRepository.save(patDTO);
         }
+    }
+
+    public void removePatient(Long id) {
+        this.patientRepository.deleteById(id);
+    }
+
+    public Patient updatePatient(Patient pat) {
+        Patient p= this.patientRepository.findById(pat.getId()).orElseThrow(() -> new IllegalStateException("Entry not found"));
+        p.setName(pat.getName());
+        p.setEmail(pat.getEmail());
+        p.setDbo(pat.getDbo());
+        return this.patientRepository.save(p);
     }
 }
