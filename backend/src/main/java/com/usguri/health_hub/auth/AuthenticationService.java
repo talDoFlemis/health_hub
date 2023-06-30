@@ -1,5 +1,6 @@
 package com.usguri.health_hub.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.usguri.health_hub.config.JwtService;
 import com.usguri.health_hub.token.Token;
 import com.usguri.health_hub.token.TokenRepository;
@@ -7,12 +8,20 @@ import com.usguri.health_hub.token.TokenType;
 import com.usguri.health_hub.user.Role;
 import com.usguri.health_hub.user.User;
 import com.usguri.health_hub.user.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +41,12 @@ public class AuthenticationService {
                 .build();
         var savedUser = userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(savedUser, jwtToken);
-        return AuthenticationResponse.builder().token(jwtToken).build();
+        return AuthenticationResponse.builder()
+                .accessToken(jwtToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest req) {
@@ -43,9 +56,13 @@ public class AuthenticationService {
 
         var user =  userRepository.findByEmail(req.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         var jwtToken = jwtService.generateToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
-        return AuthenticationResponse.builder().token(jwtToken).build();
+        return AuthenticationResponse.builder()
+                .accessToken(jwtToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     private void revokeAllUserTokens(User user){
@@ -64,5 +81,32 @@ public class AuthenticationService {
                 .revoked(false)
                 .build();
         tokenRepository.save(token);
+    }
+
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        final String refreshToken;
+        final String userEmail;
+        String headerStart = "Bearer ";
+        if (authHeader == null || !authHeader.startsWith(headerStart)) {
+            return;
+        }
+
+        refreshToken = authHeader.substring(headerStart.length());
+        userEmail = jwtService.extractUsername(refreshToken);
+        if (userEmail != null){
+            var userDetails = this.userRepository.findByEmail(userEmail).orElseThrow();
+            if(jwtService.isTokenValid(refreshToken, userDetails)){
+                var accessToken = jwtService.generateToken(userDetails);
+                revokeAllUserTokens(userDetails);
+                saveUserToken(userDetails, accessToken);
+                var authResponse = AuthenticationResponse.builder()
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken)
+                        .build();
+
+                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+            }
+        }
     }
 }
