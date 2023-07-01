@@ -1,67 +1,54 @@
 package com.usguri.health_hub.patient;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "${apiPrefix}/patient")
+@RequiredArgsConstructor
 public class PatientController {
-    private final PatientService patientService;
+  private final PatientService patientService;
 
-    @Autowired
-    public PatientController(PatientService patientService) {
-        this.patientService = patientService;
-    }
+  @GetMapping("/me")
+  public Patient getMyData(Authentication auth) {
+    return this.patientService.findByEmail(auth.getName());
+  }
 
-    @GetMapping
-    public List<Patient> getPatients() {
-        return this.patientService.getAll();
-    }
+  @GetMapping("/all")
+  @PreAuthorize(value = "hasAnyRole('ADMIN', 'ATTENDANT')")
+  public List<Patient> getAllPatients() {
+    return this.patientService.getAll();
+  }
 
-    @GetMapping("/{id}")
-    public Patient getPatientById(@PathVariable Long id) {
-        Optional<Patient> pat = this.patientService.findById(id);
-        if (pat.isPresent()) {
-            return pat.get();
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "patient with id: " + id + " was not found");
-        }
-    }
+  @GetMapping("/{id}")
+  @PreAuthorize(value = "hasAnyRole('ADMIN', 'ATTENDANT')")
+  public Patient getPatientById(@PathVariable Long id) {
+    return this.patientService.findById(id);
+  }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Patient registerPatient(@RequestBody Patient pat) {
-        try {
-            return this.patientService.createPatient(pat);
-        } catch (IllegalStateException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "email " + pat.getEmail() + " taken");
-        }
-    }
+  @PostMapping("/create")
+  @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize(value = "hasAnyRole('ADMIN', 'ATTENDANT')")
+  public Patient registerPatient(@Valid @RequestBody CreatePatientDTO pat) {
+    return this.patientService.createPatient(pat);
+  }
 
-    @DeleteMapping("{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public void removePatient(@PathVariable Long id) {
-        try {
-            this.patientService.removePatient(id);
-        } catch (IllegalStateException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+  @DeleteMapping("{id}")
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize(value = "hasAnyRole('ADMIN', 'ATTENDANT')")
+  public void removePatient(@PathVariable Long id) {
+    this.patientService.removePatient(id);
+  }
 
-    }
-
-    @PatchMapping("{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public Patient updatePatient(@RequestBody Patient pat) {
-        try {
-            return this.patientService.updatePatient(pat);
-        } catch (IllegalStateException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-
-    }
+  @PatchMapping("/update/{id}")
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize(value = "hasAnyRole('ADMIN', 'ATTENDANT')")
+  public Patient updatePatient(@Valid @RequestBody UpdatePatientDTO pat, @PathVariable Long id) {
+    return this.patientService.updatePatient(pat, id);
+  }
 }
