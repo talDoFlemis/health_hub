@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/patient")
+@RequestMapping(path = "${apiPrefix}/patient")
 public class PatientController {
     private final PatientService patientService;
 
