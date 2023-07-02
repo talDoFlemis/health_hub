@@ -1,10 +1,11 @@
 package com.usguri.health_hub.physician;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 
@@ -18,6 +19,12 @@ public class PhysicianService {
 
     public List<Physician> getPhysicians(){
         return physicianRepository.findAll();
+    }
+
+    private Physician findPhysicianById(Long id) {
+        return this.physicianRepository
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Physician with 'id':" + id + " not found."));
     }
 
     public void addNewPhysician(Physician physician) {
@@ -38,34 +45,24 @@ public class PhysicianService {
     }
 
     @Transactional
-    public void updatePhysician(Long physicianId, String name, String email, Specialty specialty) {
-        Physician physician = physicianRepository.findPhysicianById(physicianId).
-                orElseThrow(()-> new IllegalStateException("physician with id "+ physicianId +" does not exist"));
+    public Physician updatePhysician(UpdatePhysicianDTO dto, Long physicianId) {
+        Physician original = findPhysicianById(physicianId);
 
-        if(name != null && name.length()>0 && !Objects.equals(physician.getName(), name)){
-            physician.setName(name);
+        if (dto.getName() != null) {
+            original.setName(dto.getName());
         }
-        if(email != null &&
-                email.length()>0 &&
-                !Objects.equals(physician.getEmail(), email)){
-            Optional<Physician> physicianOptional = physicianRepository.findPhysicianByEmail(email);
-            if (physicianOptional.isPresent()){
-                throw new IllegalStateException("email taken");
-            }
-            physician.setEmail(email);
+        if (dto.getEmail() != null) {
+            original.setEmail(dto.getEmail());
+        }
+        if (dto.getSpecialty() != null){
+            original.setSpecialty(dto.getSpecialty());
         }
 
-        if(!Objects.equals(physician.getSpecialty(), specialty)){
-            try {
-                Specialty.valueOf(specialty.name());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalStateException("Specialty unavailable");
-            }
-            physician.setSpecialty(specialty);
+        try {
+            return this.physicianRepository.save(original);
+        } catch (Exception e) {
+            throw new EntityExistsException("Physician with email: " + dto.getEmail() + " already exists");
         }
-
-
-
 
     }
 }

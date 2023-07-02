@@ -33,39 +33,4 @@ public class Physician {
     @Enumerated(EnumType.STRING)
     private Specialty specialty;
 
-
-    public String getName() {
-        return this.name;
-    }
-
-    public String getEmail() {
-        return this.email;
-    }
-
-    public Specialty getSpecialty() {
-        return this.specialty;
-    }
-
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setSpecialty(Specialty specialty) {
-        this.specialty = specialty;
-    }
-
-    @Override
-    public String toString() {
-        return "Student{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", speacialty=" + specialty +
-                '}';
-    }
 }

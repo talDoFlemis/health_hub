@@ -12,6 +12,4 @@ public interface PhysicianRepository extends JpaRepository<Physician, Long> {
     @Query("SELECT p FROM Physician p WHERE p.email =?1")
     Optional<Physician> findPhysicianByEmail(String email);
 
-    //@Query("SELECT p FROM Physician p WHERE p.id =?1")
-    Optional<Physician> findPhysicianById(Long id);
 }
