@@ -3,11 +3,14 @@ name: Frontend CI
 on:
   pull_request:
     branches: ["main"]
-    paths: ["frontend"]
+    paths: ["frontend/**"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js

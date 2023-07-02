@@ -1,0 +1,14 @@
+name: Format Java code
+on:
+  push:
+    branches: ["main"]
+    paths: ["backend/**"]
+
+jobs:
+  googleformat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: axel-op/googlejavaformat-action@v3
+        with:
+          args: "--skip-sorting-imports --replace"
