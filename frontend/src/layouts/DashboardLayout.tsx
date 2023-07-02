@@ -68,7 +68,7 @@ interface HeaderProps {
 
 const Header: FC<HeaderProps> = ({ openSidebar }) => {
   return (
-    <div className="flex items-center justify-between w-full h-[80px] px-5 bg-white border-b border-gray-300">
+    <div className="fixed top-0 right-0 flex items-center justify-between w-full h-[80px] px-5 bg-white border-b border-gray-300">
       <IconButton
         display={{ base: "flex", md: "none" }}
         onClick={() => openSidebar()}
@@ -85,17 +85,18 @@ const Header: FC<HeaderProps> = ({ openSidebar }) => {
         </Avatar>
         <div className="hidden md:block">
           <h3 className="text-sm text-primary font-bold">Gabrigas</h3>
-          <h4 className="text-xs">Atendente</h4>
+          <h4 className="text-xs text-description">Atendente</h4>
         </div>
       </div>
     </div>
   )
 }
 
-const SideBar = () => {
-  const router = useRouter()
-  const currentRoute = router.pathname
+interface SidebarProps {
+  currentRoute: string
+}
 
+const SideBar: FC<SidebarProps> = ({ currentRoute }) => {
   return (
     <div className={`
       hidden fixed md:flex flex-col 
@@ -125,11 +126,12 @@ interface DashboardLayoutProps {
 
 const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
-
+  const { pathname } = useRouter()
+  
   return (
     <>
       <Header openSidebar={onOpen}/> 
-      <SideBar />
+      <SideBar currentRoute={pathname} />
       <Drawer
         isOpen={isOpen}
         onClose={onClose}
@@ -147,13 +149,15 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
           <DrawerBody>
             <div className="flex flex-col py-4 gap-2">
               {sidebarItems.map((link) => {
-                return <SidebarItem key={link.name} {...link} />
+                const isActive = pathname === link.path
+                
+                return <SidebarItem key={link.name} isActive={isActive} {...link} />
               })}
             </div>
           </DrawerBody>
         </DrawerContent>
       </Drawer>
-      <div className={`w-full min-h-screen bg-gray-200 ${inter.className}`}>
+      <div className={`w-[calc(100% - 250px)] min-h-screen bg-gray-200 ${inter.className} md:ml-[250px]`}>
         {children}
       </div> 
     </>
