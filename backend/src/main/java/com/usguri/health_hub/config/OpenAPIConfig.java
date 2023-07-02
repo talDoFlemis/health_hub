@@ -15,8 +15,8 @@ import io.swagger.v3.oas.annotations.servers.Server;
             description = "OpenAPI documentation for Health Hub",
             version = "0.1.0"),
     servers = {
-      @Server(description = "Local ENV", url = "localhost:7777"),
-      @Server(description = "Production ENV", url = "healthhub.org")
+      @Server(description = "Local ENV", url = "http://localhost:7777"),
+      @Server(description = "Production ENV", url = "https://healthhub.org")
     },
     security = {
             @SecurityRequirement(
