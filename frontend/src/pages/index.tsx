@@ -10,7 +10,7 @@ const Home: NextPageWithLayout = () => {
         <title>Health Hub</title>
       </Head>
       <main>
-        index page
+        index page2
       </main> 
     </>
   )
