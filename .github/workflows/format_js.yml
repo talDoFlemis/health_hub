@@ -1,6 +1,7 @@
 name: Format Javascript code
 on:
-  push:
+  pull_request_review:
+    types: [submitted]
     branches: ["main"]
     paths: ["frontend/**"]
 
