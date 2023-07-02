@@ -1,35 +1,41 @@
 package com.usguri.health_hub.patient;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.cglib.core.Local;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.Period;
 
 @Entity
+@Data
 @NoArgsConstructor
-@Getter
-@Setter
+@AllArgsConstructor
+@Builder
 @Table(name = "patient")
 public class Patient {
     @Id
-    @SequenceGenerator(name= "patient_sequence", sequenceName = "patient_sequence", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "patient_sequence")
+    @GeneratedValue
     private Long id;
-    private String name;
+    @NotNull
+    private String firstname;
+    @NotNull
+    private String lastname;
+    @NotNull
     private LocalDate dbo;
     @Transient
     private Integer age;
-    @Column(unique=true)
+    @Column(unique = true)
+    @NotNull
+    @Email
     private String email;
 
-    public Patient(String name, LocalDate dbo, String email){
-        this.name = name;
-        this.dbo = dbo;
-        this.email = email;
+    public Patient(String firstname, String lastname, LocalDate dbo, String mail) {
+        setFirstname(firstname);
+        setLastname(lastname);
+        setDbo(dbo);
+        setEmail(mail);
     }
 
     public Integer getAge() {
