@@ -6,5 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PatientRepository extends JpaRepository<Patient, Long> {
-  Optional<Patient> findByEmail(String email);
+    Optional<Patient> findByEmail(String email);
+
+
 }
