@@ -17,8 +17,12 @@ public class PhysicianService {
     this.physicianRepository = physicianRepository;
   }
 
-  public List<Physician> getPhysicians() {
-    return physicianRepository.findAll();
+  public List<Physician> getPhysicians(Optional<Specialty> specialty) {
+    if (specialty.isPresent()) {
+      return physicianRepository.findAllBySpecialty(specialty.get());
+    } else {
+      return physicianRepository.findAll();
+    }
   }
 
   private Physician findPhysicianById(Long id) {

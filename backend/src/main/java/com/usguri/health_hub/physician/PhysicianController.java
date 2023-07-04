@@ -2,6 +2,7 @@ package com.usguri.health_hub.physician;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,8 +16,8 @@ public class PhysicianController {
 
   @GetMapping
   @PreAuthorize(value = "hasAnyRole('ADMIN', 'ATTENDANT')")
-  public List<Physician> getPhysicians() {
-    return physicianService.getPhysicians();
+  public List<Physician> getPhysicians(@RequestParam Optional<Specialty> specialty) {
+    return physicianService.getPhysicians(specialty);
   }
 
   @PostMapping

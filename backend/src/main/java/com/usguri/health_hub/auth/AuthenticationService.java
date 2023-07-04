@@ -10,6 +10,7 @@ import com.usguri.health_hub.user.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -114,5 +115,20 @@ public class AuthenticationService {
         new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
       }
     }
+  }
+
+  public User getMyUserDetails(String email) {
+    User userFromDb =
+        userRepository
+            .findByEmail(email)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    return User.builder()
+        .id(userFromDb.getId())
+        .tokens(Collections.emptyList())
+        .email(userFromDb.getEmail())
+        .lastname(userFromDb.getLastname())
+        .firstname(userFromDb.getFirstname())
+        .role(userFromDb.getRole())
+        .build();
   }
 }
