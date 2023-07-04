@@ -3,9 +3,7 @@ package com.usguri.health_hub.config;
 import com.usguri.health_hub.patient.Patient;
 import com.usguri.health_hub.patient.PatientRepository;
 import java.time.LocalDate;
-
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SeedDatabase implements CommandLineRunner {
   private final PatientRepository patientRepository;
+
   @Override
   public void run(String... args) throws Exception {
     loadUserData();
@@ -25,7 +24,6 @@ public class SeedDatabase implements CommandLineRunner {
           new Patient("Tubias", "Souza", LocalDate.now().minusYears(30), "tubias@test.com");
       patientRepository.save(pat1);
       patientRepository.save(pat2);
-
     }
     System.out.println(patientRepository.count());
   }
