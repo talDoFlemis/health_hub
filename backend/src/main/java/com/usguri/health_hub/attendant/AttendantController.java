@@ -1,41 +1,54 @@
 package com.usguri.health_hub.attendant;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "${apiPrefix}/attendant")
+@RequiredArgsConstructor
 public class AttendantController {
-    private final AttendantService attendantService;
+  private final AttendantService attendantService;
 
-    @Autowired
-    public AttendantController(AttendantService attendantService){
-        this.attendantService = attendantService;
-    }
+  @GetMapping("/me")
+  public Attendant getMyData(Authentication auth) {
+    return this.attendantService.findByEmail(auth.getName());
+  }
 
-    @GetMapping
-    public List<Attendant> getAttendants() {
-        return this.attendantService.getAll();
-    }
+  @GetMapping("/all")
+  @PreAuthorize(value = "hasAnyRole('ADMIN')")
+  public List<Attendant> getAllAttendants() {
+    return this.attendantService.getAll();
+  }
 
-    @GetMapping("/{id}")
-    public Attendant getPatientById(@PathVariable Long id) {
-        Optional<Attendant> attendant =  this.attendantService.findById(id);
-        if (attendant.isPresent()){
-            return attendant.get();
-        }else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "attendant with id: " + id + " was not found");
-        }
-    }
+  @GetMapping("/{id}")
+  @PreAuthorize(value = "hasAnyRole('ADMIN')")
+  public Attendant getAttendantById(@PathVariable Long id) {
+    return this.attendantService.findById(id);
+  }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Attendant registerPatient(){
-        return this.attendantService.createAttendant();
-    }
+  @PostMapping("/create")
+  @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize(value = "hasAnyRole('ADMIN')")
+  public Attendant registerAttendant(@Valid @RequestBody CreateAttendantDTO pat) {
+    return this.attendantService.createAttendant(pat);
+  }
+
+  @DeleteMapping("{id}")
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize(value = "hasAnyRole('ADMIN')")
+  public void removeAttendant(@PathVariable Long id) {
+    this.attendantService.removeAttendant(id);
+  }
+
+  @PatchMapping("/update/{id}")
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize(value = "hasAnyRole('ADMIN')")
+  public Attendant updateAttendant(@Valid @RequestBody UpdateAttendantDTO pat, @PathVariable Long id) {
+    return this.attendantService.updateAttendant(pat, id);
+  }
 }
