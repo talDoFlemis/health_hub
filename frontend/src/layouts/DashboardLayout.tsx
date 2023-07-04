@@ -157,7 +157,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
         </DrawerContent>
       </Drawer>
       <div
-        className={`w-[calc(100% - 250px)] min-h-screen bg-gray-200 ${inter.className} md:ml-[250px]`}
+        className={`w-full md:w-[calc(100% - 250px)] min-h-screen bg-gray-200 pt-[80px] md:pl-[250px] ${inter.className}`}
       >
         {children}
       </div>
