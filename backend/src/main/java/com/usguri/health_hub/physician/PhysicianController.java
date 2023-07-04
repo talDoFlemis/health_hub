@@ -14,7 +14,7 @@ public class PhysicianController {
   private final PhysicianService physicianService;
 
   @GetMapping
-  @PreAuthorize(value = "hasAnyRole('ADMIN')")
+  @PreAuthorize(value = "hasAnyRole('ADMIN', 'ATTENDANT')")
   public List<Physician> getPhysicians() {
     return physicianService.getPhysicians();
   }
