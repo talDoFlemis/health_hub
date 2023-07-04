@@ -1,7 +1,7 @@
-import Head from 'next/head'
-import DashboardLayout from '@/layouts/DashboardLayout' 
-import type { NextPageWithLayout } from './_app'
-import { ReactElement } from 'react'
+import Head from "next/head";
+import DashboardLayout from "@/layouts/DashboardLayout";
+import type { NextPageWithLayout } from "./_app";
+import { ReactElement } from "react";
 
 const Home: NextPageWithLayout = () => {
   return (
@@ -9,15 +9,13 @@ const Home: NextPageWithLayout = () => {
       <Head>
         <title>Health Hub</title>
       </Head>
-      <main>
-        index page2
-      </main> 
+      <main>index page2</main>
     </>
-  )
-}
+  );
+};
 
 Home.getLayout = function getLayout(page: ReactElement) {
-  return <DashboardLayout>{page}</DashboardLayout>
-}
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
 
-export default Home
+export default Home;
