@@ -7,9 +7,9 @@ import lombok.Data;
 
 @Data
 public class UpdatePhysicianDTO {
-    private String name;
-    @Email
-    private String email;
-    @Enumerated(EnumType.STRING)
-    private Specialty specialty;
+  private String name;
+  @Email private String email;
+
+  @Enumerated(EnumType.STRING)
+  private Specialty specialty;
 }

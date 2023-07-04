@@ -18,18 +18,12 @@ import io.swagger.v3.oas.annotations.servers.Server;
       @Server(description = "Local ENV", url = "http://localhost:7777"),
       @Server(description = "Production ENV", url = "https://healthhub.org")
     },
-    security = {
-            @SecurityRequirement(
-                    name = "bearerAuth"
-            )
-    }
-    )
+    security = {@SecurityRequirement(name = "bearerAuth")})
 @SecurityScheme(
-        name = "bearerAuth",
-        description = "JWT Authentication",
-        scheme = "bearer",
-        type = SecuritySchemeType.HTTP,
-        bearerFormat = "JWT",
-        in = SecuritySchemeIn.HEADER
-)
+    name = "bearerAuth",
+    description = "JWT Authentication",
+    scheme = "bearer",
+    type = SecuritySchemeType.HTTP,
+    bearerFormat = "JWT",
+    in = SecuritySchemeIn.HEADER)
 public class OpenAPIConfig {}

@@ -13,19 +13,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name="physician")
+@Table(name = "physician")
 public class Physician {
-    @Id
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "physician_sequence")
-    private Long id;
-    @NotNull
-    private String name;
-    @NotNull
-    @Email
-    private String email;
-    @Enumerated(EnumType.STRING)
-    private Specialty specialty;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "physician_sequence")
+  private Long id;
 
+  @NotNull private String name;
+  @NotNull @Email private String email;
+
+  @Enumerated(EnumType.STRING)
+  private Specialty specialty;
 }
