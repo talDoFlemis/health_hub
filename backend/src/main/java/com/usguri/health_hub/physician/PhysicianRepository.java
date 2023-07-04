@@ -8,8 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface PhysicianRepository extends JpaRepository<Physician, Long> {
-
-    @Query("SELECT p FROM Physician p WHERE p.email =?1")
+    
     Optional<Physician> findPhysicianByEmail(String email);
 
 }

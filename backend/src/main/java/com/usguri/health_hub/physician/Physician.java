@@ -16,11 +16,6 @@ import lombok.NoArgsConstructor;
 @Table(name="physician")
 public class Physician {
     @Id
-    @SequenceGenerator(
-            name="physician",
-            sequenceName = "physician_sequence",
-            allocationSize = 1)
-
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
             generator = "physician_sequence")
