@@ -14,11 +14,16 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
-function App({ Component, pageProps }: AppPropsWithLayout) {
+function App({
+  Component,
+  pageProps: { session, ...pageProps },
+}: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
 
   return (
-    <ChakraProvider>{getLayout(<Component {...pageProps} />)}</ChakraProvider>
+    <SessionProvider session={session}>
+      <ChakraProvider>{getLayout(<Component {...pageProps} />)}</ChakraProvider>
+    </SessionProvider>
   );
 }
 
