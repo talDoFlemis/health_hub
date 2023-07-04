@@ -1,14 +1,14 @@
 /** @type {import('tailwindcss').Config} */
-const { fontFamily } = require("tailwindcss/defaultTheme")
+const { fontFamily } = require("tailwindcss/defaultTheme");
 
 module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
-        secondary: "#2979FF",
-        accent: "#FF9100",
-        primary: "#0e0e5e",
+        primary: "#461bff",
+        secondary: "#0e0e5e",
+        accent: "#FF0077",
         description: "#21262C",
       },
       screens: {
@@ -17,4 +17,4 @@ module.exports = {
     },
   },
   plugins: [],
-}
+};
