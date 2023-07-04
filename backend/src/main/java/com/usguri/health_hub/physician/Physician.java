@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "physician")
 public class Physician {
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "physician_sequence")
+  @GeneratedValue
   private Long id;
 
   @NotNull private String name;
