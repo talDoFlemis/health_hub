@@ -31,7 +31,7 @@ public class PhysicianService {
   public void addNewPhysician(Physician physician) {
 
     Optional<Physician> physicianOptional =
-        physicianRepository.findPhysicianByEmail(physician.getEmail());
+        physicianRepository.findByEmail(physician.getEmail());
     if (physicianOptional.isPresent()) {
       throw new IllegalStateException("email taken");
     }
