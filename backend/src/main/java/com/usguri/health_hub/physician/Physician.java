@@ -15,9 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Table(name = "physician")
 public class Physician {
-  @Id
-  @GeneratedValue
-  private Long id;
+  @Id @GeneratedValue private Long id;
 
   @NotNull private String name;
   @NotNull @Email private String email;

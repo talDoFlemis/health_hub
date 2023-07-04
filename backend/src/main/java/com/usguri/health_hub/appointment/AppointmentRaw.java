@@ -1,6 +1,5 @@
 package com.usguri.health_hub.appointment;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import lombok.Data;
 

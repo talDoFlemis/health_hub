@@ -3,7 +3,6 @@ package com.usguri.health_hub.physician;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;

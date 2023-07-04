@@ -1,6 +1,5 @@
 package com.usguri.health_hub.appointment;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.usguri.health_hub.patient.Patient;
 import com.usguri.health_hub.physician.Physician;
@@ -29,6 +28,7 @@ public class Appointment {
   @JoinColumn(name = "patient_id")
   @JsonIgnore
   private Patient patient;
+
   @Column(name = "patient_id", insertable = false, updatable = false)
   private Long patientId;
 

@@ -52,8 +52,7 @@ public class AppointmentController {
 
   @PatchMapping("/update/{id}")
   @ResponseStatus(HttpStatus.OK)
-  public Appointment update(
-      @Valid @RequestBody UpdateAppointmentDTO app, @PathVariable Long id) {
+  public Appointment update(@Valid @RequestBody UpdateAppointmentDTO app, @PathVariable Long id) {
     return this.appointmentService.updateAppointment(app, id);
   }
 
