@@ -7,14 +7,19 @@ import com.usguri.health_hub.patient.Patient;
 import com.usguri.health_hub.patient.PatientRepository;
 import com.usguri.health_hub.physician.Physician;
 import com.usguri.health_hub.physician.PhysicianRepository;
+import com.usguri.health_hub.user.Role;
+import com.usguri.health_hub.user.User;
+import com.usguri.health_hub.user.UserRepository;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,6 +28,8 @@ public class SeedDatabase implements CommandLineRunner {
   private final PatientRepository patientRepository;
   private final PhysicianRepository physicianRepository;
   private final AppointmentRepository appointmentRepository;
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
   private <T> List<T> getListFromCSV(Class<T> clazz, String fileName) throws IOException {
     File file = new File(fileName);
@@ -70,8 +77,38 @@ public class SeedDatabase implements CommandLineRunner {
           });
       appointmentRepository.saveAll(appointments);
     }
-    System.out.println("Patient count" + patientRepository.count());
-    System.out.println("Physician count" + physicianRepository.count());
-    System.out.println("Appointment count" + appointmentRepository.count());
+    if (userRepository.count() == 0) {
+      List<User> users =
+          List.of(
+              new User(
+                  2,
+                  "Gepeto",
+                  "Souza",
+                  "gepeto@healthhub.com",
+                  passwordEncoder.encode("1234"),
+                  Role.ADMIN,
+                  Collections.emptyList()),
+              new User(
+                  3,
+                  "Gabrigas",
+                  "Carmo",
+                  "gabrigas@healthhub.com",
+                  passwordEncoder.encode("1234"),
+                  Role.ATTENDANT,
+                  Collections.emptyList()),
+              new User(
+                  4,
+                  "Tubias",
+                  "Nobre",
+                  "tubias@healthhub.com",
+                  passwordEncoder.encode("1234"),
+                  Role.ATTENDANT,
+                  Collections.emptyList()));
+      userRepository.saveAll(users);
+    }
+    System.out.println("Patient count " + patientRepository.count());
+    System.out.println("Physician count " + physicianRepository.count());
+    System.out.println("Appointment count " + appointmentRepository.count());
+    System.out.println("User count " + userRepository.count());
   }
 }
