@@ -1,6 +1,5 @@
 package com.usguri.health_hub.patient;
 
-import com.usguri.health_hub.appointment.Appointment;
 import com.usguri.health_hub.appointment.AppointmentRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
