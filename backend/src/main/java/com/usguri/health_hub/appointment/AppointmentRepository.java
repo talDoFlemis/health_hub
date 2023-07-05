@@ -18,4 +18,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
       Long id, LocalDateTime start, LocalDateTime end);
 
   List<Appointment> findAllByTimeBetweenOrderByTimeAsc(LocalDateTime start, LocalDateTime end);
+
+    void deleteAllByPatientId(Long id);
 }
