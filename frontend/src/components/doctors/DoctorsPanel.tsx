@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Specialty, SPECIALTIES } from "@/utils/constants";
 import {
   Tabs,
@@ -11,6 +11,7 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { BsSearch } from "react-icons/bs";
+import DoctorsList from "./DoctorsList";
 
 interface NameSearchBar {
   name: string
@@ -51,6 +52,8 @@ const DoctorsSearchbar = () => {
   const onSpecialtySubmit = handleSpecialtySubmit((data) => console.log(data))
 
   return (
+  <div className="flex w-full flex-col rounded-lg bg-white px-4 py-4 shadow-lg">
+
     <Tabs>
       <TabList>
         <Tab _selected={{ color: "#FF0077" }}>Nome</Tab>
@@ -102,13 +105,15 @@ const DoctorsSearchbar = () => {
         </TabPanel>
       </TabPanels>
     </Tabs>
+  </div>
   );
 };
 
 const DoctorsPanel = () => {
   return (
-    <div className="flex w-full flex-col rounded-lg bg-white px-4 py-4 shadow-lg">
+    <div className="flex flex-col gap-8">
       <DoctorsSearchbar />
+      <DoctorsList />
     </div>
   );
 };
