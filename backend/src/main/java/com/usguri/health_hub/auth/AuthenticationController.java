@@ -1,8 +1,10 @@
 package com.usguri.health_hub.auth;
 
+import com.usguri.health_hub.user.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,11 @@ public class AuthenticationController {
   public ResponseEntity<AuthenticationResponse> authenticate(
       @RequestBody AuthenticationRequest request) {
     return ResponseEntity.ok(authenticationService.authenticate(request));
+  }
+
+  @GetMapping("/user")
+  public User getMyUserDetails(Principal principal) {
+    return authenticationService.getMyUserDetails(principal.getName());
   }
 
   @PostMapping("/refresh")

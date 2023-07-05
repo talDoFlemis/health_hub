@@ -15,9 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Table(name = "physician")
 public class Physician {
-  @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "physician_sequence")
-  private Long id;
+  @Id @GeneratedValue private Long id;
 
   @NotNull private String name;
   @NotNull @Email private String email;
