@@ -1,6 +1,5 @@
 package com.usguri.health_hub.appointment;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.usguri.health_hub.patient.Patient;
 import com.usguri.health_hub.physician.Physician;
 import jakarta.persistence.*;
@@ -26,7 +25,6 @@ public class Appointment {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "patient_id")
-  @JsonIgnore
   private Patient patient;
 
   @Column(name = "patient_id", insertable = false, updatable = false)
@@ -34,7 +32,6 @@ public class Appointment {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "physician_id")
-  @JsonIgnore
   private Physician physician;
 
   @Column(name = "physician_id", insertable = false, updatable = false)
