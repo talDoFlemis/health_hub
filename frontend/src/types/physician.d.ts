@@ -1,3 +1,5 @@
+import { Specialty } from "@/utils/constants";
+
 export interface IPhysician {
   id: number;
   name: string;
