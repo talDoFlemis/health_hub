@@ -10,7 +10,7 @@ const Doctors: NextPageWithLayout = () => {
       <Head>
         <title>Health Hub - Doctors</title>
       </Head>
-			<main className="min-h-screen w-full py-4 px-2">
+      <main className="min-h-screen w-full py-4 px-2">
         <h1 className="text-primary text-5xl font-bold mb-4">Buscar</h1>
         <DoctorsPanel />
       </main>

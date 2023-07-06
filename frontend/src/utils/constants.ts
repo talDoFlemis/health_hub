@@ -13,7 +13,7 @@ export const SPECIALTIES = [
   "Psiquiatra",
   "Reumatologista",
   "Urologista",
-]
+];
 
 export type Specialty =
   | "Cardiologista"

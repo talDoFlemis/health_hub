@@ -53,10 +53,10 @@ const CreateDoctorModal: React.FC<CreateDoctorModalProps> = ({
   const validInput = "border border-primary focus:outline-primary";
   const invalidInput = "border border-accent focus:outline-accent";
 
-  const onSubmit = handleSubmit((data) => { 
-    console.log(data)
-    reset()
-    onClose()
+  const onSubmit = handleSubmit((data) => {
+    console.log(data);
+    reset();
+    onClose();
   });
 
   return (
@@ -107,7 +107,7 @@ const CreateDoctorModal: React.FC<CreateDoctorModalProps> = ({
                 <FormError message="O email do médico é necessario" />
               )}
             </FormControl>
-            <FormControl py="0.5rem"  isInvalid={!specialtyValid} isRequired>
+            <FormControl py="0.5rem" isInvalid={!specialtyValid} isRequired>
               <Select
                 placeholder="especialidade"
                 {...register("specialty", { required: true })}
@@ -139,4 +139,4 @@ const CreateDoctorModal: React.FC<CreateDoctorModalProps> = ({
   );
 };
 
-export default CreateDoctorModal
+export default CreateDoctorModal;
