@@ -1,5 +1,6 @@
 package com.usguri.health_hub.patient;
 
+import com.usguri.health_hub.appointment.AppointmentRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PatientService {
   private final PatientRepository patientRepository;
+  private final AppointmentRepository appointmentRepository;
 
   public List<Patient> getAll() {
     return this.patientRepository.findAll();
@@ -51,6 +53,7 @@ public class PatientService {
   @Transactional
   public void removePatient(Long id) {
     Patient pat = findUserById(id);
+    this.appointmentRepository.deleteAllByPatientId(id);
     this.patientRepository.deleteById(pat.getId());
   }
 

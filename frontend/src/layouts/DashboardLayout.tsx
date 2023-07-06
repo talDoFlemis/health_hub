@@ -19,6 +19,8 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { ReactElement, FC } from "react";
+import { useSession } from "next-auth/react";
+import { Roles, roleToName } from "@/utils/constants";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -67,8 +69,9 @@ interface HeaderProps {
 }
 
 const Header: FC<HeaderProps> = ({ openSidebar }) => {
+  const { data: session } = useSession();
   return (
-    <div className="fixed top-0 right-0 flex items-center justify-between w-full h-[80px] px-5 bg-white border-b border-gray-300">
+    <div className="fixed right-0 top-0 z-10 flex h-[80px] w-full items-center justify-between border-b border-gray-300 bg-white px-5">
       <IconButton
         display={{ base: "flex", md: "none" }}
         onClick={() => openSidebar()}
@@ -76,17 +79,21 @@ const Header: FC<HeaderProps> = ({ openSidebar }) => {
         aria-label="open sidebar"
         icon={<FiMenu size="1.25rem" />}
       />
-      <div className="flex items-center mx-auto md:hidden">
+      <div className="mx-auto flex items-center md:hidden">
         <h2 className="text-3xl text-primary">HH</h2>
         <BiPlusMedical className="text-primary" size="1.5rem" />
       </div>
       <div className="flex items-center gap-4 md:ml-auto">
-        <Avatar boxSize="2.25rem" name="attendant">
+        <Avatar boxSize="2.25rem" name={session?.user.name}>
           <AvatarBadge boxSize="1rem" bg="green.500" />
         </Avatar>
         <div className="hidden md:block">
-          <h3 className="text-sm text-primary font-bold">Gabrigas</h3>
-          <h4 className="text-xs text-description">Atendente</h4>
+          <h3 className="text-sm font-bold text-primary">
+            {session?.user.name}
+          </h3>
+          <h4 className="text-xs text-description">
+            {roleToName(session?.user.role as Roles)}
+          </h4>
         </div>
       </div>
     </div>
@@ -101,17 +108,17 @@ const SideBar: FC<SidebarProps> = ({ currentRoute }) => {
   return (
     <div
       className={`
-      hidden fixed md:flex flex-col 
-      top-0 left-0 h-full w-[250px] 
-      bg-white border-r border-gray-300
-      py-4 px-4 
+      fixed left-0 top-0 z-10 hidden
+      h-full w-[250px] flex-col border-r 
+      border-gray-300 bg-white px-4
+      py-4 md:flex 
     `}
     >
-      <div className="flex items-center gap-2 my-2">
-        <h1 className="text-3xl text-primary font-bold">Health Hub</h1>
+      <div className="my-2 flex items-center gap-2">
+        <h1 className="text-3xl font-bold text-primary">Health Hub</h1>
         <BiPlusMedical className="text-primary" size="1.5rem" />
       </div>
-      <div className="flex flex-col py-4 gap-2">
+      <div className="flex flex-col gap-2 py-4">
         {sidebarItems.map((link) => {
           const isActive = currentRoute.split("/")[1] === link.path.split("/")[1];
 
@@ -138,13 +145,13 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
         <DrawerContent>
           <DrawerCloseButton mt={2} />
           <DrawerHeader>
-            <div className="flex items-center gap-2 my-2">
-              <h1 className="text-3xl text-primary font-bold">Health Hub</h1>
+            <div className="my-2 flex items-center gap-2">
+              <h1 className="text-3xl font-bold text-primary">Health Hub</h1>
               <BiPlusMedical className="text-primary" size="1.5rem" />
             </div>
           </DrawerHeader>
           <DrawerBody>
-            <div className="flex flex-col py-4 gap-2">
+            <div className="flex flex-col gap-2 py-4">
               {sidebarItems.map((link) => {
                 const isActive = pathname.split("/")[1] === link.path.split("/")[1];
 
@@ -157,7 +164,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
         </DrawerContent>
       </Drawer>
       <div
-        className={`w-full md:w-[calc(100% - 250px)] min-h-screen bg-gray-200 pt-[80px] md:pl-[250px] ${inter.className}`}
+        className={`md:w-[calc(100% - 250px)] min-h-screen w-full bg-gray-200 pt-[80px] md:pl-[250px] ${inter.className}`}
       >
         {children}
       </div>

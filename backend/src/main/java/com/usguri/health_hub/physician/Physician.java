@@ -1,5 +1,6 @@
 package com.usguri.health_hub.physician;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Table(name = "physician")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Physician {
   @Id @GeneratedValue private Long id;
 
