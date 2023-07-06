@@ -9,7 +9,7 @@ export const SPECIALTIES = [
   "Nefrologista",
   "Neuroradiologista",
   "Obstetra",
-  "Pedriatra",
+  "Pediatra",
   "Psiquiatra",
   "Reumatologista",
   "Urologista",
@@ -26,7 +26,7 @@ export type Specialty =
   | "Nefrologista"
   | "Neuroradiologista"
   | "Obstetra"
-  | "Pedriatra"
+  | "Pediatra"
   | "Psiquiatra"
   | "Reumatologista"
   | "Urologista";
