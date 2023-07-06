@@ -8,6 +8,8 @@ RUN mvn package -DskipTests
 FROM eclipse-temurin:17-jre-alpine AS runtime
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
+RUN mkdir -p src/main/resources
+COPY src/main/resources/*.csv src/main/resources/
 EXPOSE 7777
 
 RUN echo "spring.datasource.url=\${SPRING_DATASOURCE_URL}" >> application.properties && \

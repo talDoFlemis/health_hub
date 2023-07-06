@@ -16,7 +16,7 @@ export const authOptions: NextAuthOptions = {
           password: credentials?.password,
         };
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/authenticate`,
+          `${process.env.API_URL}/api/auth/authenticate`,
           {
             method: "POST",
             headers: {
@@ -26,15 +26,12 @@ export const authOptions: NextAuthOptions = {
           }
         );
         const toks = await res.json();
-        const res2 = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/user`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${toks.accessToken}`,
-            },
-          }
-        );
+        const res2 = await fetch(`${process.env.API_URL}/api/auth/user`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${toks.accessToken}`,
+          },
+        });
         const user = await res2.json();
         if (res2.ok && user) {
           user.access_token = toks.accessToken;
