@@ -126,7 +126,7 @@ const CreateDoctorModal: React.FC<CreateDoctorModalProps> = ({
             </FormControl>
             <div className="flex py-2 gap-3">
               <Button ml="auto" size="sm" colorScheme="red" onClick={onClose}>
-                Close
+                Fechar
               </Button>
               <Button size="sm" colorScheme="whatsapp" type="submit">
                 Criar
