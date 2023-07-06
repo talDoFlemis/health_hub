@@ -66,9 +66,11 @@ const DeleteDoctorAlert = ({
           <AlertDialogBody>
             <p className="py-2 text-description/70">
               Tem certeza que deseja deletar o médico
-              <span className="text-accent font-bold px-1">{name}</span>? 
+              <span className="text-accent font-bold px-1">{name}</span>?
             </p>
-            <p className=" text-accent font-bold">Essa ação não pode ser desfeita.</p>
+            <p className=" text-accent font-bold">
+              Essa ação não pode ser desfeita.
+            </p>
           </AlertDialogBody>
 
           <AlertDialogFooter>

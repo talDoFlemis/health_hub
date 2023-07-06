@@ -19,32 +19,90 @@ interface DoctorCardProps {
 }
 
 const doctors: IPhysician[] = [
-  { id: 1, name: "gabrigas", email: "example@example.com", specialty: "Ginecologista" },
-  { id: 2, name: "john baiano", email: "example@example.com", specialty: "Cardiologista" },
-  { id: 3, name: "said", email: "example@example.com", specialty: "Psiquiatra" },
-  { id: 4, name: "marcelo", email: "example@example.com", specialty: "Psiquiatra" },
-  { id: 5, name: "enzo", email: "example@example.com", specialty: "Neuroradiologista" },
-  { id: 6, name: "gabrigas", email: "example@example.com", specialty: "Pediatra" },
-  { id: 7, name: "john baiano", email: "example@example.com", specialty: "Pediatra" },
-  { id: 8, name: "said", email: "example@example.com", specialty: "Urologista" },
-  { id: 9, name: "marcelo", email: "example@example.com", specialty: "Cardiologista" },
-  { id: 10, name: "enzo", email: "example@example.com", specialty: "Urologista" },
+  {
+    id: 1,
+    name: "gabrigas",
+    email: "example@example.com",
+    specialty: "Ginecologista",
+  },
+  {
+    id: 2,
+    name: "john baiano",
+    email: "example@example.com",
+    specialty: "Cardiologista",
+  },
+  {
+    id: 3,
+    name: "said",
+    email: "example@example.com",
+    specialty: "Psiquiatra",
+  },
+  {
+    id: 4,
+    name: "marcelo",
+    email: "example@example.com",
+    specialty: "Psiquiatra",
+  },
+  {
+    id: 5,
+    name: "enzo",
+    email: "example@example.com",
+    specialty: "Neuroradiologista",
+  },
+  {
+    id: 6,
+    name: "gabrigas",
+    email: "example@example.com",
+    specialty: "Pediatra",
+  },
+  {
+    id: 7,
+    name: "john baiano",
+    email: "example@example.com",
+    specialty: "Pediatra",
+  },
+  {
+    id: 8,
+    name: "said",
+    email: "example@example.com",
+    specialty: "Urologista",
+  },
+  {
+    id: 9,
+    name: "marcelo",
+    email: "example@example.com",
+    specialty: "Cardiologista",
+  },
+  {
+    id: 10,
+    name: "enzo",
+    email: "example@example.com",
+    specialty: "Urologista",
+  },
 ];
 
 const DoctorCard = ({ id, name, email, specialty }: DoctorCardProps) => {
-  const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
-  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
-  
+  const {
+    isOpen: isEditOpen,
+    onOpen: onEditOpen,
+    onClose: onEditClose,
+  } = useDisclosure();
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose,
+  } = useDisclosure();
+
   return (
     <>
-      <EditDoctorModal 
+      <EditDoctorModal
         isOpen={isEditOpen}
         onClose={onEditClose}
         name={name}
         email={email}
         specialty={specialty}
       />
-      <DeleteDoctorAlert 
+      <DeleteDoctorAlert
         id={id}
         name={name}
         isOpen={isDeleteOpen}
@@ -57,14 +115,10 @@ const DoctorCard = ({ id, name, email, specialty }: DoctorCardProps) => {
           <h4 className="text-md text-description/70">{specialty}</h4>
         </div>
         <button className="ml-auto self-start" onClick={onEditOpen}>
-          <BiPencil
-            className="text-description/70 hover:text-primary"
-          />
+          <BiPencil className="text-description/70 hover:text-primary" />
         </button>
         <button className="self-start" onClick={onDeleteOpen}>
-          <AiOutlineClose
-            className="text-description/70 text-sm hover:text-accent"
-          />
+          <AiOutlineClose className="text-description/70 text-sm hover:text-accent" />
         </button>
       </div>
     </>
