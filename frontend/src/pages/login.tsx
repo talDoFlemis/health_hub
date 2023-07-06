@@ -1,9 +1,10 @@
 import Head from "next/head";
 import { useForm } from "react-hook-form";
 import { FormControl, FormLabel } from "@chakra-ui/react";
+import { signIn } from "next-auth/react";
 
 interface LoginData {
-  email: string;
+  username: string;
   password: string;
 }
 
@@ -13,7 +14,7 @@ interface FormErrorProps {
 
 const FormError = ({ message }: FormErrorProps) => {
   return (
-    <span className="text-accent text-sm font-semibold px-2">{message}</span>
+    <span className="px-2 text-sm font-semibold text-accent">{message}</span>
   );
 };
 
@@ -24,16 +25,16 @@ const LoginForm = () => {
     formState: { errors },
   } = useForm<LoginData>();
 
-  const emailValid = errors.email ? false : true;
+  const emailValid = errors.username ? false : true;
   const passwordValid = errors.password ? false : true;
   const inputStyle = "px-2 py-1 w-full text-description/70 rounded-lg";
   const validInput = "border border-primary focus:outline-primary";
   const invalidInput = "border border-accent focus:outline-accent";
 
-  const onSubmit = handleSubmit((data) => console.log(data));
+  const onSubmit = handleSubmit((data) => signIn("credentials", { ...data }));
 
   return (
-    <div className="flex h-[500px] w-[325px] md:w-[350px] flex-col rounded-lg bg-white px-2 py-4 shadow-lg ">
+    <div className="flex h-[500px] w-[325px] flex-col rounded-lg bg-white px-2 py-4 shadow-lg md:w-[350px] ">
       <h1 className="mb-12 text-center text-4xl font-bold text-primary">
         Login
       </h1>
@@ -50,7 +51,7 @@ const LoginForm = () => {
             }
             placeholder="example@example.com"
             type="email"
-            {...register("email", { required: true })}
+            {...register("username", { required: true })}
           />
           {!emailValid && <FormError message="Email is required" />}
         </FormControl>

@@ -1,21 +1,19 @@
 package com.usguri.health_hub.physician;
 
+import com.usguri.health_hub.appointment.AppointmentRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class PhysicianService {
   private final PhysicianRepository physicianRepository;
-
-  @Autowired
-  public PhysicianService(PhysicianRepository physicianRepository) {
-    this.physicianRepository = physicianRepository;
-  }
+  private final AppointmentRepository appointmentRepository;
 
   public List<Physician> getPhysicians(Optional<Specialty> specialty) {
     if (specialty.isPresent()) {
@@ -41,11 +39,13 @@ public class PhysicianService {
     physicianRepository.save(physician);
   }
 
+  @Transactional
   public void deletePhysician(Long physicianId) {
     boolean exists = physicianRepository.existsById(physicianId);
     if (!exists) {
       throw new IllegalStateException("physician with id " + physicianId + " does not exist");
     }
+    appointmentRepository.deleteAllByPhysicianId(physicianId);
     physicianRepository.deleteById(physicianId);
   }
 
