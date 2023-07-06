@@ -1,5 +1,5 @@
 import React from "react";
-import { Avatar } from "@chakra-ui/react";
+import { Avatar, Skeleton } from "@chakra-ui/react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useDisclosure } from "@chakra-ui/react";
 import CreateDoctorModal from "./CreateDoctorModal";
@@ -17,69 +17,6 @@ interface DoctorCardProps {
   email: string;
   specialty: Specialty;
 }
-
-const doctors: IPhysician[] = [
-  {
-    id: 1,
-    name: "gabrigas",
-    email: "example@example.com",
-    specialty: "Ginecologista",
-  },
-  {
-    id: 2,
-    name: "john baiano",
-    email: "example@example.com",
-    specialty: "Cardiologista",
-  },
-  {
-    id: 3,
-    name: "said",
-    email: "example@example.com",
-    specialty: "Psiquiatra",
-  },
-  {
-    id: 4,
-    name: "marcelo",
-    email: "example@example.com",
-    specialty: "Psiquiatra",
-  },
-  {
-    id: 5,
-    name: "enzo",
-    email: "example@example.com",
-    specialty: "Neuroradiologista",
-  },
-  {
-    id: 6,
-    name: "gabrigas",
-    email: "example@example.com",
-    specialty: "Pediatra",
-  },
-  {
-    id: 7,
-    name: "john baiano",
-    email: "example@example.com",
-    specialty: "Pediatra",
-  },
-  {
-    id: 8,
-    name: "said",
-    email: "example@example.com",
-    specialty: "Urologista",
-  },
-  {
-    id: 9,
-    name: "marcelo",
-    email: "example@example.com",
-    specialty: "Cardiologista",
-  },
-  {
-    id: 10,
-    name: "enzo",
-    email: "example@example.com",
-    specialty: "Urologista",
-  },
-];
 
 const DoctorCard = ({ id, name, email, specialty }: DoctorCardProps) => {
   const {
@@ -118,7 +55,7 @@ const DoctorCard = ({ id, name, email, specialty }: DoctorCardProps) => {
           <BiPencil className="text-description/70 hover:text-primary" />
         </button>
         <button className="self-start" onClick={onDeleteOpen}>
-          <AiOutlineClose className="text-description/70 text-sm hover:text-accent" />
+          <AiOutlineClose className="text-sm text-description/70 hover:text-accent" />
         </button>
       </div>
     </>
@@ -126,8 +63,7 @@ const DoctorCard = ({ id, name, email, specialty }: DoctorCardProps) => {
 };
 
 const DoctorsList = () => {
-  // const { data: doctors, mutate } = useCustomQuery<IPhysician[]>("/api/psysician")
-
+  const { data: doctors } = useCustomQuery<IPhysician[]>("/api/physician");
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
@@ -143,17 +79,21 @@ const DoctorsList = () => {
           <AiOutlinePlus className="text-white" size="1.25rem" />
         </button>
       </div>
-      {doctors.map((doctor) => {
-        return (
-          <DoctorCard
-            key={doctor.id}
-            id={doctor.id}
-            name={doctor.name}
-            email={doctor.email}
-            specialty={doctor.specialty}
-          />
-        );
-      })}
+      {doctors ? (
+        doctors.map((doctor) => {
+          return (
+            <DoctorCard
+              key={doctor.id}
+              id={doctor.id}
+              name={doctor.name}
+              email={doctor.email}
+              specialty={doctor.specialty}
+            />
+          );
+        })
+      ) : (
+        <Skeleton height="140px" width="100%" />
+      )}
     </div>
   );
 };
