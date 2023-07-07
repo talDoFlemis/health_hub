@@ -82,8 +82,12 @@ public class PatientService {
   }
 
   @Transactional
-    public List<Appointment> findAppointmentsByEmail(String name) {
-        Patient pat = this.patientRepository.findByEmail(name).orElseThrow(() -> new EntityNotFoundException("Patient with email: " + name + " not found"));
-        return this.appointmentRepository.findAllByPatientIdOrderByTimeAsc(pat.getId());
-    }
+  public List<Appointment> findAppointmentsByEmail(String name) {
+    Patient pat =
+        this.patientRepository
+            .findByEmail(name)
+            .orElseThrow(
+                () -> new EntityNotFoundException("Patient with email: " + name + " not found"));
+    return this.appointmentRepository.findAllByPatientIdOrderByTimeAsc(pat.getId());
+  }
 }

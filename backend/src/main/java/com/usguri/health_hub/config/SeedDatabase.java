@@ -53,54 +53,57 @@ public class SeedDatabase implements CommandLineRunner {
       patientRepository.saveAll(patients);
     }
     if (physicianRepository.count() == 0) {
-      List<Physician> physicians = getListFromCSV(Physician.class, "src/main/resources/physicians.csv");
+      List<Physician> physicians =
+          getListFromCSV(Physician.class, "src/main/resources/physicians.csv");
       physicianRepository.saveAll(physicians);
     }
     if (db_empty) {
-      List<AppointmentRaw> appointmentRaws = getListFromCSV(AppointmentRaw.class,
-          "src/main/resources/appointments.csv");
+      List<AppointmentRaw> appointmentRaws =
+          getListFromCSV(AppointmentRaw.class, "src/main/resources/appointments.csv");
       List<Appointment> appointments = new ArrayList<>();
       appointmentRaws.forEach(
           a -> {
             Patient patient = patientRepository.findById(a.getPatient_id()).orElseThrow();
             Physician physician = physicianRepository.findById(a.getPhysician_id()).orElseThrow();
-            Appointment appointment = Appointment.builder()
-                .id(a.getId())
-                .annotations(a.getAnnotations())
-                .time(a.getTime())
-                .patient(patient)
-                .physician(physician)
-                .build();
+            Appointment appointment =
+                Appointment.builder()
+                    .id(a.getId())
+                    .annotations(a.getAnnotations())
+                    .time(a.getTime())
+                    .patient(patient)
+                    .physician(physician)
+                    .build();
             appointments.add(appointment);
           });
       appointmentRepository.saveAll(appointments);
     }
     if (userRepository.count() == 0) {
-      List<User> users = List.of(
-          new User(
-              2,
-              "Gepeto",
-              "Souza",
-              "gepeto@healthhub.com",
-              passwordEncoder.encode("1234"),
-              Role.ADMIN,
-              Collections.emptyList()),
-          new User(
-              3,
-              "Gabrigas",
-              "Carmo",
-              "gabrigas@healthhub.com",
-              passwordEncoder.encode("1234"),
-              Role.ATTENDANT,
-              Collections.emptyList()),
-          new User(
-              4,
-              "Tubias",
-              "Nobre",
-              "tubias@healthhub.com",
-              passwordEncoder.encode("1234"),
-              Role.PATIENT,
-              Collections.emptyList()));
+      List<User> users =
+          List.of(
+              new User(
+                  2,
+                  "Gepeto",
+                  "Souza",
+                  "gepeto@healthhub.com",
+                  passwordEncoder.encode("1234"),
+                  Role.ADMIN,
+                  Collections.emptyList()),
+              new User(
+                  3,
+                  "Gabrigas",
+                  "Carmo",
+                  "gabrigas@healthhub.com",
+                  passwordEncoder.encode("1234"),
+                  Role.ATTENDANT,
+                  Collections.emptyList()),
+              new User(
+                  4,
+                  "Tubias",
+                  "Nobre",
+                  "tubias@healthhub.com",
+                  passwordEncoder.encode("1234"),
+                  Role.PATIENT,
+                  Collections.emptyList()));
       userRepository.saveAll(users);
       patientRepository.save(
           Patient.builder()
