@@ -60,8 +60,8 @@ const DoctorCard = ({ doctor, doctors, mutate }: DoctorCardProps) => {
 };
 
 interface DoctorsListProps {
-  doctors: IPhysician[]
-  mutate: (args: any) => void
+  doctors: IPhysician[];
+  mutate: (args: any) => void;
 }
 
 const DoctorsList = ({ doctors, mutate }: DoctorsListProps) => {
@@ -85,7 +85,8 @@ const DoctorsList = ({ doctors, mutate }: DoctorsListProps) => {
           <AiOutlinePlus className="text-white" size="1.25rem" />
         </button>
       </div>
-      {doctors.length > 0 ? doctors.map((doctor) => {
+      {doctors.length > 0 ? (
+        doctors.map((doctor) => {
           return (
             <DoctorCard
               key={doctor.id}
@@ -94,14 +95,12 @@ const DoctorsList = ({ doctors, mutate }: DoctorsListProps) => {
               mutate={mutate}
             />
           );
-        }) : (
-          <span
-            className="py-4 px-2 text-description/70 text-xl"
-          >
-            Nenhum médico encontrado... 
-          </span> 
-        )
-       }
+        })
+      ) : (
+        <span className="py-4 px-2 text-description/70 text-xl">
+          Nenhum médico encontrado...
+        </span>
+      )}
     </div>
   );
 };
