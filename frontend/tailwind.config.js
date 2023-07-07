@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-const { fontFamily } = require("tailwindcss/defaultTheme")
+const { fontFamily } = require("tailwindcss/defaultTheme");
 
 module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
@@ -8,9 +8,7 @@ module.exports = {
       colors: {
         primary: "#461bff",
         secondary: "#0e0e5e",
-        box: "#B1B3C7",
-        boxText: "#FFFFFF",
-        accent: "#FF9100",
+        accent: "#FF0077",
         description: "#21262C",
       },
       screens: {
@@ -19,4 +17,4 @@ module.exports = {
     },
   },
   plugins: [],
-}
+};

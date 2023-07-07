@@ -16,14 +16,20 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "framer-motion": "^10.12.18",
+    "moment": "^2.29.4",
     "next": "13.4.3",
+    "next-auth": "^4.22.1",
     "react": "18.2.0",
+    "react-big-calendar": "^1.8.1",
     "react-dom": "18.2.0",
-    "react-icons": "^4.10.1"
+    "react-hook-form": "^7.45.1",
+    "react-icons": "^4.10.1",
+    "swr": "^2.2.0"
   },
   "devDependencies": {
     "@types/node": "20.2.1",
     "@types/react": "18.2.6",
+    "@types/react-big-calendar": "^1.6.4",
     "@types/react-dom": "18.2.4",
     "autoprefixer": "10.4.14",
     "eslint": "8.41.0",

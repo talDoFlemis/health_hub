@@ -1,12 +1,10 @@
 import Head from "next/head";
 import { useForm } from "react-hook-form";
-import {
-  FormControl,
-  FormLabel,
-} from "@chakra-ui/react";
+import { FormControl, FormLabel } from "@chakra-ui/react";
+import { signIn } from "next-auth/react";
 
 interface LoginData {
-  email: string;
+  username: string;
   password: string;
 }
 
@@ -15,8 +13,10 @@ interface FormErrorProps {
 }
 
 const FormError = ({ message }: FormErrorProps) => {
-  return <span className="text-accent text-sm font-semibold px-2">{message}</span>
-}
+  return (
+    <span className="px-2 text-sm font-semibold text-accent">{message}</span>
+  );
+};
 
 const LoginForm = () => {
   const {
@@ -25,50 +25,51 @@ const LoginForm = () => {
     formState: { errors },
   } = useForm<LoginData>();
 
-  const emailValid = errors.email ? false : true;
+  const emailValid = errors.username ? false : true;
   const passwordValid = errors.password ? false : true;
   const inputStyle = "px-2 py-1 w-full text-description/70 rounded-lg";
-  const validInput = "border border-primary focus:outline-primary"
+  const validInput = "border border-primary focus:outline-primary";
   const invalidInput = "border border-accent focus:outline-accent";
 
-  const onSubmit = handleSubmit((data) => console.log(data));
+  const onSubmit = handleSubmit((data) => signIn("credentials", { ...data }));
 
   return (
-    <div className="flex h-[500px] w-[325px] md:w-[350px] flex-col rounded-lg bg-white px-2 py-4 shadow-lg ">
+    <div className="flex h-[500px] w-[325px] flex-col rounded-lg bg-white px-2 py-4 shadow-lg md:w-[350px] ">
       <h1 className="mb-12 text-center text-4xl font-bold text-primary">
         Login
       </h1>
-      <form 
-        className="flex h-full flex-col gap-4 px-4"
-        onSubmit={onSubmit}
-      >
+      <form className="flex h-full flex-col gap-4 px-4" onSubmit={onSubmit}>
         <FormControl isInvalid={!emailValid} isRequired>
           <FormLabel className="text-description/70" mb={1}>
             Email
           </FormLabel>
           <input
             className={
-              emailValid ? `${inputStyle} ${validInput}` : `${inputStyle} ${invalidInput}`
+              emailValid
+                ? `${inputStyle} ${validInput}`
+                : `${inputStyle} ${invalidInput}`
             }
             placeholder="example@example.com"
             type="email"
-            {...register("email", { required: true })}
+            {...register("username", { required: true })}
           />
-          {!emailValid && (<FormError message="Email is required" />)}
+          {!emailValid && <FormError message="Email is required" />}
         </FormControl>
-        <FormControl isInvalid={!passwordValid} isRequired >
+        <FormControl isInvalid={!passwordValid} isRequired>
           <FormLabel className="text-description/70" mb={1}>
             password
           </FormLabel>
           <input
             className={
-              passwordValid ? `${inputStyle} ${validInput}` : `${inputStyle} ${invalidInput}`
+              passwordValid
+                ? `${inputStyle} ${validInput}`
+                : `${inputStyle} ${invalidInput}`
             }
             placeholder="password"
             type="password"
             {...register("password", { required: true })}
           />
-          {!passwordValid && (<FormError message="Password is required" />)}
+          {!passwordValid && <FormError message="Password is required" />}
         </FormControl>
         <button
           className={`

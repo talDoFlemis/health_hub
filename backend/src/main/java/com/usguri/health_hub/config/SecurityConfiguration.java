@@ -29,6 +29,8 @@ public class SecurityConfiguration {
     httpSecurity
         .csrf()
         .disable()
+        .cors()
+        .and()
         .authorizeHttpRequests()
         .requestMatchers(
             "/api/auth/**",
@@ -44,6 +46,8 @@ public class SecurityConfiguration {
         .permitAll()
         .requestMatchers("/api/patient")
         .hasAnyRole(ADMIN.name(), PATIENT.name(), ATTENDANT.name())
+        .requestMatchers("/api/appointment")
+        .hasAnyRole(ADMIN.name(), ATTENDANT.name())
         .anyRequest()
         .authenticated()
         .and()

@@ -1,12 +1,11 @@
 package com.usguri.health_hub.patient;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
-
 import java.time.LocalDate;
-import java.time.Period;
+import lombok.*;
 
 @Entity
 @Data
@@ -14,31 +13,15 @@ import java.time.Period;
 @AllArgsConstructor
 @Builder
 @Table(name = "patient")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Patient {
-    @Id
-    @GeneratedValue
-    private Long id;
-    @NotNull
-    private String firstname;
-    @NotNull
-    private String lastname;
-    @NotNull
-    private LocalDate dbo;
-    @Transient
-    private Integer age;
-    @Column(unique = true)
-    @NotNull
-    @Email
-    private String email;
+  @Id @GeneratedValue private Long id;
+  @NotNull private String firstname;
+  @NotNull private String lastname;
+  @NotNull private LocalDate dbo;
 
-    public Patient(String firstname, String lastname, LocalDate dbo, String mail) {
-        setFirstname(firstname);
-        setLastname(lastname);
-        setDbo(dbo);
-        setEmail(mail);
-    }
-
-    public Integer getAge() {
-        return Period.between(this.getDbo(), LocalDate.now()).getYears();
-    }
+  @Column(unique = true)
+  @NotNull
+  @Email
+  private String email;
 }
