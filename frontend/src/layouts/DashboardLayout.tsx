@@ -6,6 +6,7 @@ import { BiPlusMedical } from "react-icons/bi";
 import { FaHome, FaUserFriends } from "react-icons/fa";
 import { FaUserDoctor } from "react-icons/fa6";
 import { BsFillCalendarDayFill } from "react-icons/bs";
+import { RiLogoutBoxRLine } from "react-icons/ri"
 import { type IconType } from "react-icons";
 import {
   Avatar,
@@ -19,7 +20,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { ReactElement, FC } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { Roles, roleToName } from "@/utils/constants";
 import { PiFolderSimpleUserBold } from "react-icons/pi";
 
@@ -92,6 +93,34 @@ const SidebarItem: FC<SidebarItemProps> = ({ name, Icon, path, isActive }) => {
   );
 };
 
+const SignOutButton = () => {
+  const buttonStyle = `
+        group flex py-2 px-4 gap-4 rounded-md  
+        hover:bg-primary [transition:background_200ms_ease-in]
+      `;
+  const iconStyle =
+    "text-primary group-hover:text-white [transition:color_200ms_ease-in]";
+  const spanStyle =
+    "text-primary font-semibold text-md group-hover:text-white [transition:color_200ms_ease-in]";
+
+  return (
+    <button
+      className={buttonStyle}
+      onClick={() => signOut({ callbackUrl: "/login" })}
+    >
+      <RiLogoutBoxRLine 
+        className={iconStyle}
+        size="1.25rem"
+      />
+      <span
+        className={spanStyle}
+      >
+        logout
+      </span>  
+    </button>
+  )
+}
+
 interface HeaderProps {
   openSidebar: () => void;
 }
@@ -158,6 +187,7 @@ const SideBar: FC<SidebarProps> = ({ currentRoute }) => {
               <SidebarItem key={link.name} isActive={isActive} {...link} />
             );
           })}
+        <SignOutButton />
       </div>
     </div>
   );
@@ -194,6 +224,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                   <SidebarItem key={link.name} isActive={isActive} {...link} />
                 );
               })}
+              <SignOutButton />
             </div>
           </DrawerBody>
         </DrawerContent>
