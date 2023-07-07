@@ -5,19 +5,22 @@ export interface IPhysician {
   specialty: Specialty;
 }
 
+export type ICreatePhysician = Omit<IPhysician, "id">;
+export type IUpdatePhysician = ICreatePhysician;
+
 export enum Specialty {
-  CARDIOLOGY = "Cardiologista",
-  DERMATOLOGY = "Dermatologista",
-  ENDOCRINOLOGY = "Endocrinologista",
-  GASTROENTEROLOGY = "Gastroenterologista",
-  GERIATRICS = "Geriatra",
-  GYNECOLOGY = "Ginecologista",
-  HEMATOLOGY = "Hematologista",
-  NEPHROLOGY = "Nefrologista",
-  NEURORADIOLOGY = "Neurorradiologista",
-  OBSTETRICS = "Obstetra",
-  PEDIATRICS = "Pediatra",
-  PSYCHIATRY = "Psiquiatra",
-  RHEUMATOLOGY = "Reumatologista",
-  UROLOGY = "Urologista",
+  CARDIOLOGY = "CARDIOLOGY",
+  DERMATOLOGY = "DERMATOLOGY",
+  ENDOCRINOLOGY = "ENDOCRINOLOGY",
+  GASTROENTEROLOGY = "GASTROENTEROLOGY",
+  GERIATRICS = "GERIATRICS",
+  GYNECOLOGY = "GYNECOLOGY",
+  HEMATOLOGY = "HEMATOLOGY",
+  NEPHROLOGY = "NEPHROLOGY",
+  NEURORADIOLOGY = "NEURORADIOLOGY",
+  OBSTETRICS = "OBSTETRICS",
+  PEDIATRICS = "PEDIATRICS",
+  PSYCHIATRY = "PSYCHIATRY",
+  RHEUMATOLOGY = "RHEUMATOLOGY",
+  UROLOGY = "UROLOGY",
 }

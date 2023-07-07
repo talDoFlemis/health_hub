@@ -6,6 +6,23 @@ export enum Roles {
   Physician = "PHYSICIAN",
 }
 
+export const SPECIALTIES = [
+  "CARDIOLOGY",
+  "DERMATOLOGY",
+  "ENDOCRINOLOGY",
+  "GASTROENTEROLOGY",
+  "GERIATRICS",
+  "GYNECOLOGY",
+  "HEMATOLOGY",
+  "NEPHROLOGY",
+  "NEURORADIOLOGY",
+  "OBSTETRICS",
+  "PEDIATRICS",
+  "PSYCHIATRY",
+  "RHEUMATOLOGY",
+  "UROLOGY",
+];
+
 export const roleToName = (role: Roles) => {
   switch (role) {
     case Roles.Admin:

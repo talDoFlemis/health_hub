@@ -23,8 +23,8 @@ public class PhysicianController {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(value = "hasAnyRole('ADMIN')")
-  public void registerNewPhysician(@RequestBody Physician physician) {
-    physicianService.addNewPhysician(physician);
+  public Physician registerNewPhysician(@RequestBody Physician physician) {
+    return physicianService.addNewPhysician(physician);
   }
 
   @DeleteMapping(path = "{physicianId}")

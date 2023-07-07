@@ -30,13 +30,13 @@ public class PhysicianService {
             () -> new EntityNotFoundException("Physician with 'id':" + id + " not found."));
   }
 
-  public void addNewPhysician(Physician physician) {
+  public Physician addNewPhysician(Physician physician) {
 
     Optional<Physician> physicianOptional = physicianRepository.findByEmail(physician.getEmail());
     if (physicianOptional.isPresent()) {
       throw new IllegalStateException("email taken");
     }
-    physicianRepository.save(physician);
+    return physicianRepository.save(physician);
   }
 
   @Transactional

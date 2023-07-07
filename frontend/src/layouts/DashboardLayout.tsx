@@ -120,7 +120,8 @@ const SideBar: FC<SidebarProps> = ({ currentRoute }) => {
       </div>
       <div className="flex flex-col gap-2 py-4">
         {sidebarItems.map((link) => {
-          const isActive = currentRoute === link.path;
+          const isActive =
+            currentRoute.split("/")[1] === link.path.split("/")[1];
 
           return <SidebarItem key={link.name} isActive={isActive} {...link} />;
         })}
@@ -153,7 +154,8 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
           <DrawerBody>
             <div className="flex flex-col gap-2 py-4">
               {sidebarItems.map((link) => {
-                const isActive = pathname === link.path;
+                const isActive =
+                  pathname.split("/")[1] === link.path.split("/")[1];
 
                 return (
                   <SidebarItem key={link.name} isActive={isActive} {...link} />
