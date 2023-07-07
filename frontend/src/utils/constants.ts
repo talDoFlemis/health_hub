@@ -21,7 +21,7 @@ export const SPECIALTIES = [
   "PSYCHIATRY",
   "RHEUMATOLOGY",
   "UROLOGY",
-]
+];
 
 export const roleToName = (role: Roles) => {
   switch (role) {

@@ -12,8 +12,8 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { IPhysician, IUpdatePhysician } from "@/types/physician"
-import { SPECIALTIES, API_URL } from "@/utils/constants"
+import { IPhysician, IUpdatePhysician } from "@/types/physician";
+import { SPECIALTIES, API_URL } from "@/utils/constants";
 import useCustomToast from "@/hooks/useCustomToast";
 import { useSession } from "next-auth/react";
 
@@ -59,8 +59,8 @@ const EditDoctorModal: React.FC<EditDoctorModalProps> = ({
   const invalidInput = "border border-accent focus:outline-accent";
 
   const filteredDoctors = (updatedId: number) => {
-    return doctors.filter((doctor) => doctor.id !== updatedId)
-  }
+    return doctors.filter((doctor) => doctor.id !== updatedId);
+  };
 
   const onSubmit = async (updatedDoctor: IUpdatePhysician) => {
     const access = session?.user.access_token as string;
@@ -76,11 +76,11 @@ const EditDoctorModal: React.FC<EditDoctorModalProps> = ({
       const data = await res.json();
       mutate([...filteredDoctors(doctor.id), data]);
       showSuccessToast("Médico modificado com sucesso");
-      reset()
-      onClose()
+      reset();
+      onClose();
     } catch (error: any) {
       showErrorToast("Erro ao modificar médico", error.message);
-    }    
+    }
   };
 
   return (
@@ -94,7 +94,10 @@ const EditDoctorModal: React.FC<EditDoctorModalProps> = ({
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <form className="flex h-full flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+          <form
+            className="flex h-full flex-col gap-4"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <FormControl isInvalid={!nameValid} isRequired>
               <FormLabel className="text-description/70" mb={1}>
                 Nome

@@ -12,8 +12,8 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { SPECIALTIES, API_URL } from "@/utils/constants"
-import { IPhysician, ICreatePhysician } from "@/types/physician"
+import { SPECIALTIES, API_URL } from "@/utils/constants";
+import { IPhysician, ICreatePhysician } from "@/types/physician";
 import { useSession } from "next-auth/react";
 import useCustomToast from "@/hooks/useCustomToast";
 
@@ -71,8 +71,8 @@ const CreateDoctorModal: React.FC<CreateDoctorModalProps> = ({
       const newDoctor = await res.json();
       showSuccessToast("Médico criado com sucesso");
       mutate([...doctors, newDoctor]);
-      reset()
-      onClose()
+      reset();
+      onClose();
     } catch (error: any) {
       showErrorToast("Erro ao criar médico", error.message);
     }
@@ -89,7 +89,10 @@ const CreateDoctorModal: React.FC<CreateDoctorModalProps> = ({
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <form className="flex h-full flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+          <form
+            className="flex h-full flex-col gap-4"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <FormControl isInvalid={!nameValid} isRequired>
               <FormLabel className="text-description/70" mb={1}>
                 Nome

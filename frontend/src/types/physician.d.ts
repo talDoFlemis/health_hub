@@ -5,9 +5,8 @@ export interface IPhysician {
   specialty: Specialty;
 }
 
-export type ICreatePhysician = Omit<IPhysician, "id">
-export type IUpdatePhysician = ICreatePhysician
-
+export type ICreatePhysician = Omit<IPhysician, "id">;
+export type IUpdatePhysician = ICreatePhysician;
 
 export enum Specialty {
   CARDIOLOGY = "CARDIOLOGY",

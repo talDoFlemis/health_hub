@@ -13,7 +13,7 @@ import { IPhysician } from "@/types/physician";
 interface DoctorCardProps {
   doctor: IPhysician;
   doctors: IPhysician[];
-  mutate: (args: any) => void
+  mutate: (args: any) => void;
 }
 
 const DoctorCard = ({ doctor, doctors, mutate }: DoctorCardProps) => {
@@ -61,16 +61,17 @@ const DoctorCard = ({ doctor, doctors, mutate }: DoctorCardProps) => {
 };
 
 const DoctorsList = () => {
-  const { data: doctors, mutate } = useCustomQuery<IPhysician[]>("/api/physician");
+  const { data: doctors, mutate } =
+    useCustomQuery<IPhysician[]>("/api/physician");
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <div className="grid w-full gap-2 rounded-lg bg-white px-4 py-4 shadow-lg lg:grid-cols-2">
-      <CreateDoctorModal 
-        doctors={doctors ?? []} 
+      <CreateDoctorModal
+        doctors={doctors ?? []}
         mutate={mutate}
-        isOpen={isOpen} 
-        onClose={onClose} 
+        isOpen={isOpen}
+        onClose={onClose}
       />
       <div className="flex items-center lg:col-span-full">
         <h1 className="mb-4 text-5xl font-bold text-primary">Médicos</h1>
