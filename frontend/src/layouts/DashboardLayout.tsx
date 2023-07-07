@@ -6,7 +6,7 @@ import { BiPlusMedical } from "react-icons/bi";
 import { FaHome, FaUserFriends } from "react-icons/fa";
 import { FaUserDoctor } from "react-icons/fa6";
 import { BsFillCalendarDayFill } from "react-icons/bs";
-import { RiLogoutBoxRLine } from "react-icons/ri"
+import { RiLogoutBoxRLine } from "react-icons/ri";
 import { type IconType } from "react-icons";
 import {
   Avatar,
@@ -108,18 +108,11 @@ const SignOutButton = () => {
       className={buttonStyle}
       onClick={() => signOut({ callbackUrl: "/login" })}
     >
-      <RiLogoutBoxRLine 
-        className={iconStyle}
-        size="1.25rem"
-      />
-      <span
-        className={spanStyle}
-      >
-        logout
-      </span>  
+      <RiLogoutBoxRLine className={iconStyle} size="1.25rem" />
+      <span className={spanStyle}>logout</span>
     </button>
-  )
-}
+  );
+};
 
 interface HeaderProps {
   openSidebar: () => void;

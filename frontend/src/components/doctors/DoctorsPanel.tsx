@@ -9,7 +9,7 @@ import {
   TabPanel,
   TabIndicator,
   Select,
-  Skeleton
+  Skeleton,
 } from "@chakra-ui/react";
 import { BsSearch } from "react-icons/bs";
 import { AiOutlineClose } from "react-icons/ai";
@@ -41,8 +41,12 @@ const FormError = ({ message }: FormErrorProps) => {
   );
 };
 
-const DoctorsSearchBar = ({ searchByName, searchBySpecialty, resetSearch }: DoctorsSearchBarProps) => {
-  const [active, setActive] = useState<boolean>(false)
+const DoctorsSearchBar = ({
+  searchByName,
+  searchBySpecialty,
+  resetSearch,
+}: DoctorsSearchBarProps) => {
+  const [active, setActive] = useState<boolean>(false);
   const {
     register: registerName,
     reset: resetName,
@@ -56,26 +60,26 @@ const DoctorsSearchBar = ({ searchByName, searchBySpecialty, resetSearch }: Doct
     handleSubmit: handleSpecialtySubmit,
     formState: { errors: specialtyErrors },
   } = useForm<SpecialtySearchBar>();
-  
+
   const inputValid = nameErrors.name ? false : true;
   const selectValid = specialtyErrors.specialty ? false : true;
 
   const onNameSubmit = handleNameSubmit((data) => {
     searchByName(data.name);
-    setActive(true)
+    setActive(true);
   });
-  
+
   const onSpecialtySubmit = handleSpecialtySubmit((data) => {
     searchBySpecialty(data.specialty);
-    setActive(true) 
-  }); 
-  
+    setActive(true);
+  });
+
   const cleanSearchBar = () => {
-    resetSearch()
-    resetName()
-    resetSpecialty()
-    setActive(false)
-  }
+    resetSearch();
+    resetName();
+    resetSpecialty();
+    setActive(false);
+  };
 
   return (
     <div className="flex w-full flex-col rounded-lg bg-white px-4 py-4 shadow-lg">
@@ -102,7 +106,7 @@ const DoctorsSearchBar = ({ searchByName, searchBySpecialty, resetSearch }: Doct
                 />
                 {active && (
                   <button onClick={() => cleanSearchBar()}>
-                    <AiOutlineClose 
+                    <AiOutlineClose
                       className="text-description/70 hover:text-accent"
                       size="1rem"
                     />
@@ -118,10 +122,7 @@ const DoctorsSearchBar = ({ searchByName, searchBySpecialty, resetSearch }: Doct
             </form>
           </TabPanel>
           <TabPanel py="1.5rem">
-            <form 
-              className="flex flex-col gap-2" 
-              onSubmit={onSpecialtySubmit}
-            >
+            <form className="flex flex-col gap-2" onSubmit={onSpecialtySubmit}>
               <div className="flex items-center gap-3 w-full lg:w-2/3 max-w-[400px]">
                 <Select
                   placeholder="especialidade"
@@ -137,7 +138,7 @@ const DoctorsSearchBar = ({ searchByName, searchBySpecialty, resetSearch }: Doct
                 </Select>
                 {active && (
                   <button onClick={() => cleanSearchBar()}>
-                    <AiOutlineClose 
+                    <AiOutlineClose
                       className="text-description/70 hover:text-accent"
                       size="1rem"
                     />
@@ -160,39 +161,39 @@ const DoctorsSearchBar = ({ searchByName, searchBySpecialty, resetSearch }: Doct
 
 const DoctorsPanel = () => {
   const [name, setName] = useState<string>("");
-  const [specialty, setSpecialty] = useState<string>("")
-  
-  const URL = "/api/physician" 
-    + (specialty ? `?specialty=${specialty}` : "")
-    + (name ? `?name=${name}` : "")
-  
+  const [specialty, setSpecialty] = useState<string>("");
+
+  const URL =
+    "/api/physician" +
+    (specialty ? `?specialty=${specialty}` : "") +
+    (name ? `?name=${name}` : "");
+
   const searchByName = (name: string) => {
-    setName(name)
-    setSpecialty("")
-  }
+    setName(name);
+    setSpecialty("");
+  };
 
   const searchBySpecialty = (specialty: Specialty) => {
-    setSpecialty(specialty)
-    setName("")
-  }
-  
+    setSpecialty(specialty);
+    setName("");
+  };
+
   const resetSearch = () => {
     setName("");
     setSpecialty("");
-  }
+  };
 
-  const { data: doctors, mutate } = 
-    useCustomQuery<IPhysician[]>(URL);
-  
+  const { data: doctors, mutate } = useCustomQuery<IPhysician[]>(URL);
+
   return (
     <div className="flex flex-col gap-8">
-      <DoctorsSearchBar 
+      <DoctorsSearchBar
         resetSearch={resetSearch}
         searchByName={searchByName}
         searchBySpecialty={searchBySpecialty}
       />
       {doctors ? (
-        <DoctorsList doctors={doctors} mutate={mutate}/>
+        <DoctorsList doctors={doctors} mutate={mutate} />
       ) : (
         <Skeleton height="140px" width="100%" />
       )}
