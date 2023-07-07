@@ -1,36 +1,3 @@
-export const SPECIALTIES = [
-  "Cardiologista",
-  "Dermatologista",
-  "Endocrinologista",
-  "Gastroenterologista",
-  "Geriatra",
-  "Ginecologista",
-  "Hematologista",
-  "Nefrologista",
-  "Neuroradiologista",
-  "Obstetra",
-  "Pediatra",
-  "Psiquiatra",
-  "Reumatologista",
-  "Urologista",
-];
-
-export type Specialty =
-  | "Cardiologista"
-  | "Dermatologista"
-  | "Endocrinologista"
-  | "Gastroenterologista"
-  | "Geriatra"
-  | "Ginecologista"
-  | "Hematologista"
-  | "Nefrologista"
-  | "Neuroradiologista"
-  | "Obstetra"
-  | "Pediatra"
-  | "Psiquiatra"
-  | "Reumatologista"
-  | "Urologista";
-
 export const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export enum Roles {
   Admin = "ADMIN",
@@ -38,6 +5,23 @@ export enum Roles {
   Patient = "PATIENT",
   Physician = "PHYSICIAN",
 }
+
+export const SPECIALTIES = [
+  "CARDIOLOGY",
+  "DERMATOLOGY",
+  "ENDOCRINOLOGY",
+  "GASTROENTEROLOGY",
+  "GERIATRICS",
+  "GYNECOLOGY",
+  "HEMATOLOGY",
+  "NEPHROLOGY",
+  "NEURORADIOLOGY",
+  "OBSTETRICS",
+  "PEDIATRICS",
+  "PSYCHIATRY",
+  "RHEUMATOLOGY",
+  "UROLOGY",
+]
 
 export const roleToName = (role: Roles) => {
   switch (role) {
