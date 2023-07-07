@@ -12,11 +12,16 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { SPECIALTIES } from "@/utils/constants";
+import { SPECIALTIES, API_URL } from "@/utils/constants"
+import { IPhysician, ICreatePhysician } from "@/types/physician"
+import { useSession } from "next-auth/react";
+import useCustomToast from "@/hooks/useCustomToast";
 
 interface CreateDoctorModalProps {
   isOpen: boolean;
+  doctors: IPhysician[];
   onClose: () => void;
+  mutate: (args: any) => void;
 }
 
 interface FormErrorProps {
@@ -29,22 +34,21 @@ const FormError = ({ message }: FormErrorProps) => {
   );
 };
 
-interface CreateDoctorData {
-  name: string;
-  email: string;
-  specialty: string;
-}
-
 const CreateDoctorModal: React.FC<CreateDoctorModalProps> = ({
   isOpen,
   onClose,
+  doctors,
+  mutate,
 }) => {
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<CreateDoctorData>();
+  } = useForm<ICreatePhysician>({ mode: "onBlur" });
+
+  const { data: session } = useSession();
+  const { showSuccessToast, showErrorToast } = useCustomToast();
 
   const nameValid = errors.name ? false : true;
   const emailValid = errors.email ? false : true;
@@ -53,11 +57,26 @@ const CreateDoctorModal: React.FC<CreateDoctorModalProps> = ({
   const validInput = "border border-primary focus:outline-primary";
   const invalidInput = "border border-accent focus:outline-accent";
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(data);
-    reset();
-    onClose();
-  });
+  const onSubmit = async (data: ICreatePhysician) => {
+    const access = session?.user.access_token as string;
+    try {
+      const res = await fetch(`${API_URL}/api/physician`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${access}`,
+        },
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      const newDoctor = await res.json();
+      showSuccessToast("Médico criado com sucesso");
+      mutate([...doctors, newDoctor]);
+      reset()
+      onClose()
+    } catch (error: any) {
+      showErrorToast("Erro ao criar médico", error.message);
+    }
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={{ base: "sm", md: "md" }}>
@@ -70,7 +89,7 @@ const CreateDoctorModal: React.FC<CreateDoctorModalProps> = ({
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <form className="flex h-full flex-col gap-4" onSubmit={onSubmit}>
+          <form className="flex h-full flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
             <FormControl isInvalid={!nameValid} isRequired>
               <FormLabel className="text-description/70" mb={1}>
                 Nome
@@ -115,7 +134,7 @@ const CreateDoctorModal: React.FC<CreateDoctorModalProps> = ({
                 {SPECIALTIES.map((especialty, index) => {
                   return (
                     <option key={especialty + index} value={especialty}>
-                      {especialty}
+                      {especialty.toLowerCase()}
                     </option>
                   );
                 })}

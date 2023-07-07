@@ -1,6 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Specialty, SPECIALTIES } from "@/utils/constants";
+import { SPECIALTIES } from "@/utils/constants";
+import { Specialty } from "@/types/physician";
 import {
   Tabs,
   TabList,
@@ -92,7 +93,7 @@ const DoctorsSearchbar = () => {
                   {SPECIALTIES.map((especialty, index) => {
                     return (
                       <option key={especialty + index} value={especialty}>
-                        {especialty}
+                        {especialty.toLowerCase()}
                       </option>
                     );
                   })}

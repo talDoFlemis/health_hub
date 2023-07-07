@@ -7,18 +7,16 @@ import EditDoctorModal from "./EditDoctorModal";
 import DeleteDoctorAlert from "./DeleteDoctorAlert";
 import { AiOutlineClose } from "react-icons/ai";
 import { BiPencil } from "react-icons/bi";
-import { Specialty } from "@/utils/constants";
 import { useCustomQuery } from "@/hooks/useCustomQuery";
 import { IPhysician } from "@/types/physician";
 
 interface DoctorCardProps {
-  id: number;
-  name: string;
-  email: string;
-  specialty: Specialty;
+  doctor: IPhysician;
+  doctors: IPhysician[];
+  mutate: (args: any) => void
 }
 
-const DoctorCard = ({ id, name, email, specialty }: DoctorCardProps) => {
+const DoctorCard = ({ doctor, doctors, mutate }: DoctorCardProps) => {
   const {
     isOpen: isEditOpen,
     onOpen: onEditOpen,
@@ -35,21 +33,21 @@ const DoctorCard = ({ id, name, email, specialty }: DoctorCardProps) => {
       <EditDoctorModal
         isOpen={isEditOpen}
         onClose={onEditClose}
-        name={name}
-        email={email}
-        specialty={specialty}
+        doctor={doctor}
+        doctors={doctors}
+        mutate={mutate}
       />
       <DeleteDoctorAlert
-        id={id}
-        name={name}
+        id={doctor.id}
+        name={doctor.name}
         isOpen={isDeleteOpen}
         onClose={onDeleteClose}
       />
       <div className="flex w-full items-center gap-4 rounded-lg border border-description/30 px-4 py-2">
-        <Avatar name={name} />
+        <Avatar name={doctor.name} />
         <div>
-          <h3 className="text-xl font-bold text-primary">{name}</h3>
-          <h4 className="text-md text-description/70">{specialty}</h4>
+          <h3 className="text-xl font-bold text-primary">{doctor.name}</h3>
+          <h4 className="text-md text-description/70">{doctor.specialty}</h4>
         </div>
         <button className="ml-auto self-start" onClick={onEditOpen}>
           <BiPencil className="text-description/70 hover:text-primary" />
@@ -63,12 +61,17 @@ const DoctorCard = ({ id, name, email, specialty }: DoctorCardProps) => {
 };
 
 const DoctorsList = () => {
-  const { data: doctors } = useCustomQuery<IPhysician[]>("/api/physician");
+  const { data: doctors, mutate } = useCustomQuery<IPhysician[]>("/api/physician");
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <div className="grid w-full gap-2 rounded-lg bg-white px-4 py-4 shadow-lg lg:grid-cols-2">
-      <CreateDoctorModal isOpen={isOpen} onClose={onClose} />
+      <CreateDoctorModal 
+        doctors={doctors ?? []} 
+        mutate={mutate}
+        isOpen={isOpen} 
+        onClose={onClose} 
+      />
       <div className="flex items-center lg:col-span-full">
         <h1 className="mb-4 text-5xl font-bold text-primary">Médicos</h1>
         <button
@@ -80,14 +83,13 @@ const DoctorsList = () => {
         </button>
       </div>
       {doctors ? (
-        doctors.map((doctor) => {
+        doctors?.map((doctor) => {
           return (
             <DoctorCard
               key={doctor.id}
-              id={doctor.id}
-              name={doctor.name}
-              email={doctor.email}
-              specialty={doctor.specialty}
+              doctor={doctor}
+              doctors={doctors}
+              mutate={mutate}
             />
           );
         })
