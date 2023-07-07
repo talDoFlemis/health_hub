@@ -59,7 +59,7 @@ const DeleteDoctorAlert = ({
         <AlertDialogContent>
           <AlertDialogHeader>
             <h2 className="text-xl font-bold text-description/70">
-              Deleter médico
+              Deletar médico
             </h2>
           </AlertDialogHeader>
 
