@@ -12,15 +12,17 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { SPECIALTIES } from "@/utils/constants";
-import { Specialty } from "@/utils/constants";
+import { IPhysician, IUpdatePhysician } from "@/types/physician"
+import { SPECIALTIES, API_URL } from "@/utils/constants"
+import useCustomToast from "@/hooks/useCustomToast";
+import { useSession } from "next-auth/react";
 
 interface EditDoctorModalProps {
   isOpen: boolean;
   onClose: () => void;
-  name: string;
-  email: string;
-  specialty: Specialty;
+  mutate: (args: any) => void;
+  doctor: IPhysician;
+  doctors: IPhysician[];
 }
 
 interface FormErrorProps {
@@ -33,25 +35,21 @@ const FormError = ({ message }: FormErrorProps) => {
   );
 };
 
-interface CreateDoctorData {
-  name: string;
-  email: string;
-  specialty: string;
-}
-
 const EditDoctorModal: React.FC<EditDoctorModalProps> = ({
   isOpen,
   onClose,
-  name,
-  email,
-  specialty,
+  doctor,
+  doctors,
+  mutate,
 }) => {
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<CreateDoctorData>();
+  } = useForm<IUpdatePhysician>({ mode: "onBlur", defaultValues: doctor });
+  const { data: session } = useSession();
+  const { showSuccessToast, showErrorToast } = useCustomToast();
 
   const nameValid = errors.name ? false : true;
   const emailValid = errors.email ? false : true;
@@ -60,11 +58,30 @@ const EditDoctorModal: React.FC<EditDoctorModalProps> = ({
   const validInput = "border border-primary focus:outline-primary";
   const invalidInput = "border border-accent focus:outline-accent";
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(data);
-    reset();
-    onClose();
-  });
+  const filteredDoctors = (updatedId: number) => {
+    return doctors.filter((doctor) => doctor.id !== updatedId)
+  }
+
+  const onSubmit = async (updatedDoctor: IUpdatePhysician) => {
+    const access = session?.user.access_token as string;
+    try {
+      const res = await fetch(`${API_URL}/api/physician/${doctor.id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${access}`,
+        },
+        method: "PATCH",
+        body: JSON.stringify(updatedDoctor),
+      });
+      const data = await res.json();
+      mutate([...filteredDoctors(doctor.id), data]);
+      showSuccessToast("Médico modificado com sucesso");
+      reset()
+      onClose()
+    } catch (error: any) {
+      showErrorToast("Erro ao modificar médico", error.message);
+    }    
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={{ base: "sm", md: "md" }}>
@@ -77,7 +94,7 @@ const EditDoctorModal: React.FC<EditDoctorModalProps> = ({
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <form className="flex h-full flex-col gap-4" onSubmit={onSubmit}>
+          <form className="flex h-full flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
             <FormControl isInvalid={!nameValid} isRequired>
               <FormLabel className="text-description/70" mb={1}>
                 Nome
@@ -89,7 +106,6 @@ const EditDoctorModal: React.FC<EditDoctorModalProps> = ({
                     : `${inputStyle} ${invalidInput}`
                 }
                 placeholder="Gabrigas"
-                defaultValue={name}
                 type="text"
                 {...register("name", { required: true })}
               />
@@ -108,7 +124,6 @@ const EditDoctorModal: React.FC<EditDoctorModalProps> = ({
                     : `${inputStyle} ${invalidInput}`
                 }
                 placeholder="example@example.com"
-                defaultValue={email}
                 type="email"
                 {...register("email", { required: true })}
               />
@@ -119,13 +134,12 @@ const EditDoctorModal: React.FC<EditDoctorModalProps> = ({
             <FormControl py="0.5rem" isInvalid={!specialtyValid} isRequired>
               <Select
                 placeholder="especialidade"
-                defaultValue={specialty}
                 {...register("specialty", { required: true })}
               >
-                {SPECIALTIES.map((especialty, index) => {
+                {SPECIALTIES.map((item, index) => {
                   return (
-                    <option key={especialty + index} value={especialty}>
-                      {especialty}
+                    <option key={item + index} value={item}>
+                      {item.toLowerCase()}
                     </option>
                   );
                 })}
