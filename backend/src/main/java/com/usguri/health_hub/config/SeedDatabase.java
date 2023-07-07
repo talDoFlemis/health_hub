@@ -102,9 +102,16 @@ public class SeedDatabase implements CommandLineRunner {
                   "Nobre",
                   "tubias@healthhub.com",
                   passwordEncoder.encode("1234"),
-                  Role.ATTENDANT,
+                  Role.PATIENT,
                   Collections.emptyList()));
       userRepository.saveAll(users);
+      patientRepository.save(
+          Patient.builder()
+              .firstname("Tubias")
+              .lastname("Nobre")
+              .dbo(java.time.LocalDate.parse("1999-01-01"))
+              .email("tubias@healthhub.com")
+              .build());
     }
     System.out.println("Patient count " + patientRepository.count());
     System.out.println("Physician count " + physicianRepository.count());

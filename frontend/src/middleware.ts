@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { withAuth } from "next-auth/middleware";
+import { Roles } from "./utils/constants";
 
 export default withAuth(
   function middleware(req) {
     const { nextUrl, nextauth } = req;
     const { pathname } = nextUrl;
     const { token } = nextauth;
+    if (token?.role === Roles.Patient && pathname !== "/my-appointments") {
+      return NextResponse.redirect(new URL("/my-appointments", req.url));
+    }
     if (token && pathname === "/login") {
       return NextResponse.redirect(new URL("/", req.url));
     }
