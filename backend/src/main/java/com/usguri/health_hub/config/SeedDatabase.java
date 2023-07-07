@@ -102,7 +102,7 @@ public class SeedDatabase implements CommandLineRunner {
                   "Nobre",
                   "tubias@healthhub.com",
                   passwordEncoder.encode("1234"),
-                  Role.ATTENDANT,
+                  Role.PATIENT,
                   Collections.emptyList()));
       userRepository.saveAll(users);
     }

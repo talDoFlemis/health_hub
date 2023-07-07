@@ -1,5 +1,6 @@
 package com.usguri.health_hub.patient;
 
+import com.usguri.health_hub.appointment.Appointment;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,11 @@ public class PatientController {
   @GetMapping("/me")
   public Patient getMyData(Authentication auth) {
     return this.patientService.findByEmail(auth.getName());
+  }
+
+  @GetMapping("/me/appointments")
+  public List<Appointment> getMyAppointments(Authentication auth) {
+    return this.patientService.findAppointmentsByEmail(auth.getName());
   }
 
   @GetMapping("/all")

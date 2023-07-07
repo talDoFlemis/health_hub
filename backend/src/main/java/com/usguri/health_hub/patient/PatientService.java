@@ -1,5 +1,6 @@
 package com.usguri.health_hub.patient;
 
+import com.usguri.health_hub.appointment.Appointment;
 import com.usguri.health_hub.appointment.AppointmentRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -79,4 +80,10 @@ public class PatientService {
       throw new EntityExistsException("Patient with email: " + dto.getEmail() + " already exists");
     }
   }
+
+  @Transactional
+    public List<Appointment> findAppointmentsByEmail(String name) {
+        Patient pat = this.patientRepository.findByEmail(name).orElseThrow(() -> new EntityNotFoundException("Patient with email: " + name + " not found"));
+        return this.appointmentRepository.findAllByPatientIdOrderByTimeAsc(pat.getId());
+    }
 }
