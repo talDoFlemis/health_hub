@@ -48,7 +48,8 @@ public class AttendantController {
   @PatchMapping("/update/{id}")
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize(value = "hasAnyRole('ADMIN')")
-  public Attendant updateAttendant(@Valid @RequestBody UpdateAttendantDTO pat, @PathVariable Long id) {
+  public Attendant updateAttendant(
+      @Valid @RequestBody UpdateAttendantDTO pat, @PathVariable Long id) {
     return this.attendantService.updateAttendant(pat, id);
   }
 }

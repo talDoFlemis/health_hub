@@ -19,7 +19,8 @@ public class AttendantService {
   private Attendant findUserById(Long id) {
     return this.attendantRepository
         .findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("Attendant with 'id':" + id + " not found."));
+        .orElseThrow(
+            () -> new EntityNotFoundException("Attendant with 'id':" + id + " not found."));
   }
 
   public Attendant findById(Long id) {
@@ -44,7 +45,8 @@ public class AttendantService {
     try {
       return this.attendantRepository.save(pat);
     } catch (Exception e) {
-      throw new EntityExistsException("Attendant with email: " + dto.getEmail() + " already exists");
+      throw new EntityExistsException(
+          "Attendant with email: " + dto.getEmail() + " already exists");
     }
   }
 
@@ -73,7 +75,8 @@ public class AttendantService {
     try {
       return this.attendantRepository.save(original);
     } catch (Exception e) {
-      throw new EntityExistsException("Attendant with email: " + dto.getEmail() + " already exists");
+      throw new EntityExistsException(
+          "Attendant with email: " + dto.getEmail() + " already exists");
     }
   }
 }
