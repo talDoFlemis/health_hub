@@ -1,8 +1,7 @@
 ##### DEPENDENCIES
-FROM --platform=linux/amd64 node:18.16.0-alpine3.17 as base
+FROM node:18.16.0 as base
 
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml\* ./
