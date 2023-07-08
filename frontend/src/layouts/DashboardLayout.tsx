@@ -6,6 +6,7 @@ import { BiPlusMedical } from "react-icons/bi";
 import { FaHome, FaUserFriends } from "react-icons/fa";
 import { FaUserDoctor } from "react-icons/fa6";
 import { BsFillCalendarDayFill } from "react-icons/bs";
+import { RiLogoutBoxRLine } from "react-icons/ri";
 import { type IconType } from "react-icons";
 import {
   Avatar,
@@ -19,8 +20,9 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { ReactElement, FC } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { Roles, roleToName } from "@/utils/constants";
+import { PiFolderSimpleUserBold } from "react-icons/pi";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,13 +31,40 @@ interface SidebarItemProps {
   Icon: IconType;
   path: string;
   isActive?: boolean;
+  roles: Roles[];
 }
 
 const sidebarItems: SidebarItemProps[] = [
-  { name: "Home", Icon: FaHome, path: "/" },
-  { name: "Consultas", Icon: BsFillCalendarDayFill, path: "/appointments" },
-  { name: "Pacientes", Icon: FaUserFriends, path: "/patients" },
-  { name: "Médicos", Icon: FaUserDoctor, path: "/doctors" },
+  {
+    name: "Home",
+    Icon: FaHome,
+    path: "/",
+    roles: [Roles.Admin, Roles.Attendant],
+  },
+  {
+    name: "Consultas",
+    Icon: BsFillCalendarDayFill,
+    path: "/appointments",
+    roles: [Roles.Admin, Roles.Attendant],
+  },
+  {
+    name: "Minhas Consultas",
+    Icon: PiFolderSimpleUserBold,
+    path: "/my-appointments",
+    roles: [Roles.Patient],
+  },
+  {
+    name: "Pacientes",
+    Icon: FaUserFriends,
+    path: "/patients",
+    roles: [Roles.Admin, Roles.Attendant],
+  },
+  {
+    name: "Médicos",
+    Icon: FaUserDoctor,
+    path: "/doctors",
+    roles: [Roles.Admin, Roles.Attendant],
+  },
 ];
 
 const SidebarItem: FC<SidebarItemProps> = ({ name, Icon, path, isActive }) => {
@@ -61,6 +90,27 @@ const SidebarItem: FC<SidebarItemProps> = ({ name, Icon, path, isActive }) => {
         {name}
       </span>
     </NextLink>
+  );
+};
+
+const SignOutButton = () => {
+  const buttonStyle = `
+        group flex py-2 px-4 gap-4 rounded-md  
+        hover:bg-primary [transition:background_200ms_ease-in]
+      `;
+  const iconStyle =
+    "text-primary group-hover:text-white [transition:color_200ms_ease-in]";
+  const spanStyle =
+    "text-primary font-semibold text-md group-hover:text-white [transition:color_200ms_ease-in]";
+
+  return (
+    <button
+      className={buttonStyle}
+      onClick={() => signOut({ callbackUrl: "/login" })}
+    >
+      <RiLogoutBoxRLine className={iconStyle} size="1.25rem" />
+      <span className={spanStyle}>logout</span>
+    </button>
   );
 };
 
@@ -105,6 +155,7 @@ interface SidebarProps {
 }
 
 const SideBar: FC<SidebarProps> = ({ currentRoute }) => {
+  const role = useSession().data?.user.role as Roles;
   return (
     <div
       className={`
@@ -119,12 +170,17 @@ const SideBar: FC<SidebarProps> = ({ currentRoute }) => {
         <BiPlusMedical className="text-primary" size="1.5rem" />
       </div>
       <div className="flex flex-col gap-2 py-4">
-        {sidebarItems.map((link) => {
-          const isActive =
-            currentRoute.split("/")[1] === link.path.split("/")[1];
+        {sidebarItems
+          .filter((item) => item.roles.includes(role))
+          .map((link) => {
+            const isActive =
+              currentRoute.split("/")[1] === link.path.split("/")[1];
 
-          return <SidebarItem key={link.name} isActive={isActive} {...link} />;
-        })}
+            return (
+              <SidebarItem key={link.name} isActive={isActive} {...link} />
+            );
+          })}
+        <SignOutButton />
       </div>
     </div>
   );
@@ -161,6 +217,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                   <SidebarItem key={link.name} isActive={isActive} {...link} />
                 );
               })}
+              <SignOutButton />
             </div>
           </DrawerBody>
         </DrawerContent>

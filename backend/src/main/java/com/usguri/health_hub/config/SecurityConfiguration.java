@@ -44,9 +44,11 @@ public class SecurityConfiguration {
             "/webjars/**",
             "/swagger-ui.html")
         .permitAll()
-        .requestMatchers("/api/patient")
+        .requestMatchers("/actuator/health")
+        .permitAll()
+        .requestMatchers("/api/patient/**")
         .hasAnyRole(ADMIN.name(), PATIENT.name(), ATTENDANT.name())
-        .requestMatchers("/api/appointment")
+        .requestMatchers("/api/appointment/**")
         .hasAnyRole(ADMIN.name(), ATTENDANT.name())
         .anyRequest()
         .authenticated()

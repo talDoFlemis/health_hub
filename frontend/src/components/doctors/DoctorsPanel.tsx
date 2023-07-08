@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { SPECIALTIES } from "@/utils/constants";
-import { Specialty } from "@/types/physician";
+import { Specialty, IPhysician } from "@/types/physician";
 import {
   Tabs,
   TabList,
@@ -10,9 +9,13 @@ import {
   TabPanel,
   TabIndicator,
   Select,
+  Skeleton,
 } from "@chakra-ui/react";
 import { BsSearch } from "react-icons/bs";
+import { AiOutlineClose } from "react-icons/ai";
 import DoctorsList from "./DoctorsList";
+import { useCustomQuery } from "@/hooks/useCustomQuery";
+import { SPECIALTIES } from "@/utils/constants";
 
 interface NameSearchBar {
   name: string;
@@ -20,6 +23,12 @@ interface NameSearchBar {
 
 interface SpecialtySearchBar {
   specialty: Specialty;
+}
+
+interface DoctorsSearchBarProps {
+  searchByName: (name: string) => void;
+  searchBySpecialty: (specialty: Specialty) => void;
+  resetSearch: () => void;
 }
 
 interface FormErrorProps {
@@ -32,15 +41,22 @@ const FormError = ({ message }: FormErrorProps) => {
   );
 };
 
-const DoctorsSearchbar = () => {
+const DoctorsSearchBar = ({
+  searchByName,
+  searchBySpecialty,
+  resetSearch,
+}: DoctorsSearchBarProps) => {
+  const [active, setActive] = useState<boolean>(false);
   const {
     register: registerName,
+    reset: resetName,
     handleSubmit: handleNameSubmit,
     formState: { errors: nameErrors },
   } = useForm<NameSearchBar>();
 
   const {
     register: registerSpecialty,
+    reset: resetSpecialty,
     handleSubmit: handleSpecialtySubmit,
     formState: { errors: specialtyErrors },
   } = useForm<SpecialtySearchBar>();
@@ -48,8 +64,22 @@ const DoctorsSearchbar = () => {
   const inputValid = nameErrors.name ? false : true;
   const selectValid = specialtyErrors.specialty ? false : true;
 
-  const onNameSubmit = handleNameSubmit((data) => console.log(data));
-  const onSpecialtySubmit = handleSpecialtySubmit((data) => console.log(data));
+  const onNameSubmit = handleNameSubmit((data) => {
+    searchByName(data.name);
+    setActive(true);
+  });
+
+  const onSpecialtySubmit = handleSpecialtySubmit((data) => {
+    searchBySpecialty(data.specialty);
+    setActive(true);
+  });
+
+  const cleanSearchBar = () => {
+    resetSearch();
+    resetName();
+    resetSpecialty();
+    setActive(false);
+  };
 
   return (
     <div className="flex w-full flex-col rounded-lg bg-white px-4 py-4 shadow-lg">
@@ -74,6 +104,14 @@ const DoctorsSearchbar = () => {
                   placeholder="nome do médico"
                   {...registerName("name", { required: true })}
                 />
+                {active && (
+                  <button onClick={() => cleanSearchBar()}>
+                    <AiOutlineClose
+                      className="text-description/70 hover:text-accent"
+                      size="1rem"
+                    />
+                  </button>
+                )}
                 <button className="cursor-pointer" type="submit">
                   <BsSearch className="text-primary" size="1.25rem" />
                 </button>
@@ -98,6 +136,14 @@ const DoctorsSearchbar = () => {
                     );
                   })}
                 </Select>
+                {active && (
+                  <button onClick={() => cleanSearchBar()}>
+                    <AiOutlineClose
+                      className="text-description/70 hover:text-accent"
+                      size="1rem"
+                    />
+                  </button>
+                )}
                 <button className="cursor-pointer" type="submit">
                   <BsSearch className="text-primary" size="1.25rem" />
                 </button>
@@ -114,10 +160,43 @@ const DoctorsSearchbar = () => {
 };
 
 const DoctorsPanel = () => {
+  const [name, setName] = useState<string>("");
+  const [specialty, setSpecialty] = useState<string>("");
+
+  const URL =
+    "/api/physician" +
+    (specialty ? `?specialty=${specialty}` : "") +
+    (name ? `?name=${name}` : "");
+
+  const searchByName = (name: string) => {
+    setName(name);
+    setSpecialty("");
+  };
+
+  const searchBySpecialty = (specialty: Specialty) => {
+    setSpecialty(specialty);
+    setName("");
+  };
+
+  const resetSearch = () => {
+    setName("");
+    setSpecialty("");
+  };
+
+  const { data: doctors, mutate } = useCustomQuery<IPhysician[]>(URL);
+
   return (
     <div className="flex flex-col gap-8">
-      <DoctorsSearchbar />
-      <DoctorsList />
+      <DoctorsSearchBar
+        resetSearch={resetSearch}
+        searchByName={searchByName}
+        searchBySpecialty={searchBySpecialty}
+      />
+      {doctors ? (
+        <DoctorsList doctors={doctors} mutate={mutate} />
+      ) : (
+        <Skeleton height="140px" width="100%" />
+      )}
     </div>
   );
 };
