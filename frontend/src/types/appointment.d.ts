@@ -16,6 +16,4 @@ interface ISpecialty {
   specialty: Specialty
 }
 
-
-
-export type ICreateAppointment= Omit<IAppointment, "id" | "physician" | "patient" | "patientId"> & ISpecialty;
+export type ICreateAppointment = Omit<IAppointment, "id" | "physician" | "patient" | "patientId"> & ISpecialty;

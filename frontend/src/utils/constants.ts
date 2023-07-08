@@ -23,6 +23,23 @@ export const SPECIALTIES = [
   "UROLOGY",
 ];
 
+export const CLIENT_SPECIALITES = new Map([
+  ["CARDIOLOGY", "Cardiologia"],
+  ["DERMATOLOGY", "Dermatologia"],
+  ["ENDOCRINOLOGY", "Endocrinologia"],
+  ["GASTROENTEROLOGY", "Gastroenterologia"],
+  ["GERIATRICS", "Geriatra"],
+  ["GYNECOLOGY", "Ginecologia"],
+  ["HEMATOLOGY", "Hematologia"],
+  ["NEPHROLOGY", "Nefrologia"],
+  ["NEURORADIOLOGY", "Neurorradiologia"],
+  ["OBSTETRICS", "Obstetrícia"],
+  ["PEDIATRICS", "Pediatria"],
+  ["PSYCHIATRY", "Psiquiatria"],
+  ["RHEUMATOLOGY", "Reumatologia"],
+  ["UROLOGY", "Urologia"],
+]);
+
 export const roleToName = (role: Roles) => {
   switch (role) {
     case Roles.Admin:
