@@ -10,4 +10,5 @@ public interface AttendantRepository extends CrudRepository<Attendant, Long> {
     List<Attendant> findAll();
     Attendant save();
     void deleteById(long id);
+    Optional<Attendant> findByEmail(String email);
 }
