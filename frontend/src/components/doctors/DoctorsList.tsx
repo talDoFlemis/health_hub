@@ -1,5 +1,5 @@
 import React from "react";
-import { Avatar, Skeleton } from "@chakra-ui/react";
+import { Avatar } from "@chakra-ui/react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useDisclosure } from "@chakra-ui/react";
 import CreateDoctorModal from "./CreateDoctorModal";
@@ -7,7 +7,6 @@ import EditDoctorModal from "./EditDoctorModal";
 import DeleteDoctorAlert from "./DeleteDoctorAlert";
 import { AiOutlineClose } from "react-icons/ai";
 import { BiPencil } from "react-icons/bi";
-import { useCustomQuery } from "@/hooks/useCustomQuery";
 import { IPhysician } from "@/types/physician";
 
 interface DoctorCardProps {
@@ -60,15 +59,18 @@ const DoctorCard = ({ doctor, doctors, mutate }: DoctorCardProps) => {
   );
 };
 
-const DoctorsList = () => {
-  const { data: doctors, mutate } =
-    useCustomQuery<IPhysician[]>("/api/physician");
+interface DoctorsListProps {
+  doctors: IPhysician[];
+  mutate: (args: any) => void;
+}
+
+const DoctorsList = ({ doctors, mutate }: DoctorsListProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <div className="grid w-full gap-2 rounded-lg bg-white px-4 py-4 shadow-lg lg:grid-cols-2">
       <CreateDoctorModal
-        doctors={doctors ?? []}
+        doctors={doctors}
         mutate={mutate}
         isOpen={isOpen}
         onClose={onClose}
@@ -83,8 +85,8 @@ const DoctorsList = () => {
           <AiOutlinePlus className="text-white" size="1.25rem" />
         </button>
       </div>
-      {doctors ? (
-        doctors?.map((doctor) => {
+      {doctors.length > 0 ? (
+        doctors.map((doctor) => {
           return (
             <DoctorCard
               key={doctor.id}
@@ -95,7 +97,9 @@ const DoctorsList = () => {
           );
         })
       ) : (
-        <Skeleton height="140px" width="100%" />
+        <span className="py-4 px-2 text-description/70 text-xl">
+          Nenhum médico encontrado...
+        </span>
       )}
     </div>
   );
