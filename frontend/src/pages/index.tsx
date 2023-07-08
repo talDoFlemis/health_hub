@@ -1,15 +1,16 @@
 import Head from "next/head";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import type { NextPageWithLayout } from "./_app";
-import { ReactElement } from "react";
+import React, { ReactElement } from "react";
 import { Calendar, Messages, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useCustomQuery } from "@/hooks/useCustomQuery";
-import { Button, Skeleton } from "@chakra-ui/react";
+import {Button, Skeleton, useDisclosure} from "@chakra-ui/react";
 import { IAppointment } from "@/types/appointment";
 import { useRouter } from "next/router";
 import { BsFillCalendarPlusFill } from "react-icons/bs";
+import CreateAppointment from "@/components/appointments/CreateAppointment"
 
 const Home: NextPageWithLayout = () => {
   const { data: appointments } = useCustomQuery<IAppointment[]>(
@@ -29,6 +30,7 @@ const Home: NextPageWithLayout = () => {
     time: "Hora",
     event: "Evento",
   };
+
   const events = appointments?.map((appointment) => {
     return {
       id: appointment.id,
@@ -38,11 +40,18 @@ const Home: NextPageWithLayout = () => {
     };
   });
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
     <>
       <Head>
         <title>Health Hub</title>
       </Head>
+      <CreateAppointment
+        isOpen={isOpen}
+        onClose={onClose}
+        appointments={appointments ?? []}
+      />
       <main className="flex flex-col p-8">
         <div className="flex flex-col gap-4 rounded-lg bg-white p-8 shadow-lg">
           <div className="flex flex-wrap items-center justify-between">
@@ -50,15 +59,11 @@ const Home: NextPageWithLayout = () => {
             <Button
               colorScheme="green"
               leftIcon={<BsFillCalendarPlusFill />}
-              onClick={() =>
-                console.log(
-                  "TODO: adicionar popup de nova consulta ou redirecionar"
-                )
-              }
+              onClick={onOpen}
             >
-              {" "}
               Nova Consulta{" "}
             </Button>
+
           </div>
           <div className="h-[70vh]">
             {appointments ? (

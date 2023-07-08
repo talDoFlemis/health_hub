@@ -21,6 +21,7 @@ import moment from "moment";
 import { AiFillEye, AiOutlineUserAdd } from "react-icons/ai";
 import NextLink from "next/link";
 import AddPatientModal from "@/components/patient/AddPatientModal";
+import { Calendar, Messages, momentLocalizer } from "react-big-calendar";
 
 const PatientRow = ({ patient }: { patient: IPatient }) => {
   const fullName = `${patient.firstname} ${patient.lastname}`;
