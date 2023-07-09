@@ -15,13 +15,12 @@ import lombok.*;
 @Table(name = "attendant")
 public class Attendant {
   @Id @GeneratedValue private Long id;
-  @NotNull private String firstname;
+  private String firstname;
   @NotNull private String lastname;
   @NotNull private LocalDate dbo;
   @Transient private Integer age;
 
   @Column(unique = true)
-  @NotNull
   @Email
   private String email;
 

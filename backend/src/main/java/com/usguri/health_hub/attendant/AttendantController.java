@@ -2,6 +2,7 @@ package com.usguri.health_hub.attendant;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,8 +22,9 @@ public class AttendantController {
 
   @GetMapping("/all")
   @PreAuthorize(value = "hasAnyRole('ADMIN')")
-  public List<Attendant> getAllAttendants() {
-    return this.attendantService.getAll();
+  public List<Attendant> getAllAttendants(
+      @RequestParam Optional<String> name, @RequestParam Optional<String> email) {
+    return this.attendantService.getAll(name, email);
   }
 
   @GetMapping("/{id}")
