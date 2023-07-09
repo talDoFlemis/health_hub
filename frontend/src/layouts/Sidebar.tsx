@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { Roles } from "@/utils/constants";
 import { useSession } from "next-auth/react";
-import { sidebarItems, SidebarItem, SignOutButton } from "./SidebarItem"; 
+import { sidebarItems, SidebarItem, SignOutButton } from "./SidebarItem";
 import { BiPlusMedical } from "react-icons/bi";
 
 interface SidebarProps {

@@ -1,7 +1,7 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-// Esse objeto tem envelopa as principais funções para lidar com o sistema de 
+// Esse objeto tem envelopa as principais funções para lidar com o sistema de
 // autentificação na aplicação.
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,

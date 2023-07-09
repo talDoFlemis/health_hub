@@ -56,7 +56,12 @@ export const sidebarItems: SidebarItemProps[] = [
   },
 ];
 
-export const SidebarItem: FC<SidebarItemProps> = ({ name, Icon, path, isActive }) => {
+export const SidebarItem: FC<SidebarItemProps> = ({
+  name,
+  Icon,
+  path,
+  isActive,
+}) => {
   const nextLinkStyle = `
         group flex py-2 px-4 gap-4 rounded-md  
         hover:bg-primary [transition:background_200ms_ease-in]

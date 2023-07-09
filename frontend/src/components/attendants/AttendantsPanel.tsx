@@ -3,7 +3,7 @@ import { IAttendant } from "@/types/attendant";
 import { Skeleton } from "@chakra-ui/react";
 import { useCustomQuery } from "@/hooks/useCustomQuery";
 import AttendantsList from "./AttendantsList";
-import AttendantsSearchBar from "./AttendantsSearchBar"
+import AttendantsSearchBar from "./AttendantsSearchBar";
 
 const AttendantsPanel = () => {
   const [name, setName] = useState<string>("");

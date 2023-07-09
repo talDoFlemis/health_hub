@@ -2,7 +2,7 @@ import { useSession } from "next-auth/react";
 import useSWR from "swr";
 
 // Esta função é responsável por enviar requisições ao servidor e retornar a resposta.
-// Como utilizamos o JWT como sistema de autenficação, ela adicionar o token de acesso 
+// Como utilizamos o JWT como sistema de autenficação, ela adicionar o token de acesso
 // ao cabeçalho da requisição.
 const fetcher = async (url: string, access: string) => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
