@@ -7,6 +7,8 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,12 +17,17 @@ public class PhysicianService {
   private final PhysicianRepository physicianRepository;
   private final AppointmentRepository appointmentRepository;
 
-  public List<Physician> getPhysicians(Optional<Specialty> specialty) {
-    if (specialty.isPresent()) {
-      return physicianRepository.findAllBySpecialty(specialty.get());
-    } else {
-      return physicianRepository.findAll();
-    }
+  public List<Physician> getPhysicians(Optional<Specialty> specialty, Optional<String> name) {
+    Physician phy =
+        Physician.builder().specialty(specialty.orElse(null)).name(name.orElse(null)).build();
+    Example<Physician> probe =
+        Example.of(
+            phy,
+            ExampleMatcher.matchingAll()
+                .withIgnoreCase()
+                .withStringMatcher(ExampleMatcher.StringMatcher.STARTING)
+                .withIgnoreNullValues());
+    return this.physicianRepository.findAll(probe);
   }
 
   private Physician findPhysicianById(Long id) {
