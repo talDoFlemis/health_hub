@@ -15,41 +15,6 @@ import { AiOutlineClose } from "react-icons/ai";
 import { useCustomQuery } from "@/hooks/useCustomQuery";
 import AttendantsList from "./AttendantsList"; 
 
-const mockAttendants: IAttendant[] = [
-  { 
-    id: 1, 
-    firstname: "gabrigas", 
-    lastname: "brigas 1", 
-    email: "example1@example.com", 
-    dbo: new Date(),
-    age: 18 
-  },
-  { 
-    id: 2, 
-    firstname: "gabrigas", 
-    lastname: "brigas 2", 
-    email: "example2@example.com", 
-    dbo: new Date(),
-    age: 18 
-  },
-  { 
-    id: 3, 
-    firstname: "gabrigas", 
-    lastname: "brigas 3", 
-    email: "example3@example.com", 
-    dbo: new Date(),
-    age: 18 
-  },
-  { 
-    id: 4, 
-    firstname: "gabrigas", 
-    lastname: "brigas 4", 
-    email: "example4@example.com", 
-    dbo: new Date(),
-    age: 18 
-  },
-]
-
 interface NameSearchBar {
   name: string;
 }

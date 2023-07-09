@@ -7,6 +7,7 @@ import { BiPencil } from "react-icons/bi";
 import { IAttendant } from "@/types/attendant";
 import CreateAttendantModal from "./CreateAttendantModal";
 import EditAttendantModal from "./EditAttendantModal";
+import DeleteAttendantAlert from "./DeleteAttendantAlert";
 
 interface AttendantCardProps {
   attendant: IAttendant;
@@ -20,7 +21,12 @@ const AttendantCard = ({ attendant, attendants, mutate }: AttendantCardProps) =>
     onOpen: onEditOpen,
     onClose: onEditClose,
   } = useDisclosure();
-
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose,
+  } = useDisclosure();
+  
   const attendantName = `${attendant.firstname} ${attendant.lastname}`
 
   return (
@@ -32,6 +38,12 @@ const AttendantCard = ({ attendant, attendants, mutate }: AttendantCardProps) =>
         attendant={attendant}
         attendants={attendants}
       />
+      <DeleteAttendantAlert 
+        id={attendant.id}
+        name={attendantName}
+        isOpen={isDeleteOpen}
+        onClose={onDeleteClose}
+      />
       <div className="flex w-full items-center gap-4 rounded-lg border border-description/30 px-4 py-2">
         <Avatar name={attendantName} />
         <div>
@@ -41,7 +53,7 @@ const AttendantCard = ({ attendant, attendants, mutate }: AttendantCardProps) =>
         <button className="ml-auto self-start" onClick={onEditOpen}>
           <BiPencil className="text-description/70 hover:text-primary" />
         </button>
-        <button className="self-start">
+        <button className="self-start" onClick={onDeleteOpen}>
           <AiOutlineClose className="text-sm text-description/70 hover:text-accent" />
         </button>
       </div> 
