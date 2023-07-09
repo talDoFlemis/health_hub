@@ -114,7 +114,7 @@ const CreateAppointment = ({
     const MinutesPerAppointment = 50
     const appointmentMinutesEnd = appointmentMinutesStart + MinutesPerAppointment
 
-    const firstValidDay = moment().startOf("day").add(1, "day");
+    const firstValidDay = moment(Date.now()).startOf("day").add(1, "day");
     const lastValidDay = moment(firstValidDay).add(RangeOfDays, "day");
 
     const events: {
@@ -132,7 +132,7 @@ const CreateAppointment = ({
     const physicianAppointments = appointments.filter((appointment) => appointment.physicianId == physicianId)
     physicianAppointments.forEach((appointment) => {
       const appointmentMoment = moment(new Date(appointment.time));
-      const appointmentHour = appointmentMoment.hour();
+      const appointmentHour = appointmentMoment.startOf("hour").hour();
 
       if (
         (
@@ -147,18 +147,29 @@ const CreateAppointment = ({
         const hourIndex = appointmentHour - firstValidHour;
 
         if (OpenAppointmentsMatrix[dayIndex][hourIndex]) {
-         OpenAppointmentsMatrix[dayIndex][hourIndex] = false;
-         events.push(
-           {
-            id: appointment.id,
-            title: appointment.patient.firstname + " • " + appointment.physician.name,
-            start: new Date(appointment.time),
-            end: moment(appointment.time).add(1, "hour").toDate(),
-          }
-         )
+          OpenAppointmentsMatrix[dayIndex][hourIndex] = false;
         }
       }
     })
+
+    OpenAppointmentsMatrix.forEach(
+      (column, i) => column.forEach(
+        (free, j) => {
+          if (free) {
+            const startMoment = moment(firstValidDay).add(i, "days").add(j + firstValidHour, "hours");
+
+            events.push(
+             {
+              id: j + i*hoursWorkedPerDay,
+              title: "Horario Livre",
+              start: startMoment.toDate(),
+              end: startMoment.add(1, "hours").toDate(),
+            }
+           )
+          }
+        }
+      )
+    )
 
     return {
       events: events,
@@ -282,8 +293,12 @@ const CreateAppointment = ({
                     <Calendar
                       localizer={momentLocalizer(moment)}
                       events={events}
-                      startAccessor={limitDays.firstDay.toDate}
-                      endAccessor={limitDays.lastDay.toDate}
+                      startAccessor="start"
+                      endAccessor="end"
+                      messages={messages}
+                      defaultView="week"
+                      toolbar={false}
+                      popup
                     />
                   ) : (
                     <span className="py-4 px-2 text-description/70 text-xl">
