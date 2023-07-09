@@ -20,7 +20,12 @@ interface DeleteAttendantAlertProps {
   onClose: () => void;
 }
 
-const DeleteAttendantAlert = ({ id, name, isOpen, onClose }: DeleteAttendantAlertProps) => {
+const DeleteAttendantAlert = ({
+  id,
+  name,
+  isOpen,
+  onClose,
+}: DeleteAttendantAlertProps) => {
   const cancelRef = React.useRef(null);
   const { showSuccessToast, showErrorToast } = useCustomToast();
   const { data: session } = useSession();
@@ -54,13 +59,13 @@ const DeleteAttendantAlert = ({ id, name, isOpen, onClose }: DeleteAttendantAler
         <AlertDialogContent>
           <AlertDialogHeader>
             <h2 className="text-xl font-bold text-description/70">
-              Deletar atendente 
+              Deletar atendente
             </h2>
           </AlertDialogHeader>
 
           <AlertDialogBody>
             <p className="py-2 text-description/70">
-              Tem certeza que deseja deletar o atendente 
+              Tem certeza que deseja deletar o atendente
               <span className="text-accent font-bold px-1">{name}</span>?
             </p>
             <p className=" text-accent font-bold">
@@ -80,6 +85,6 @@ const DeleteAttendantAlert = ({ id, name, isOpen, onClose }: DeleteAttendantAler
       </AlertDialogOverlay>
     </AlertDialog>
   );
-}
+};
 
 export default DeleteAttendantAlert;

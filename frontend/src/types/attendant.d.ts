@@ -5,7 +5,7 @@ export interface IAttendant {
   email: string;
   dbo: Date;
   age: integer;
-} 
+}
 
 export type ICreateAttendant = Omit<IAttendant, "id" | "age">;
 export type IUpdateAttendant = ICreateAttendant;

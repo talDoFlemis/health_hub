@@ -13,14 +13,14 @@ import {
 import { BsSearch } from "react-icons/bs";
 import { AiOutlineClose } from "react-icons/ai";
 import { useCustomQuery } from "@/hooks/useCustomQuery";
-import AttendantsList from "./AttendantsList"; 
+import AttendantsList from "./AttendantsList";
 
 interface NameSearchBar {
   name: string;
 }
 
 interface EmailSearchBar {
-  email: string; 
+  email: string;
 }
 
 interface AttendantsSearchBarProps {
@@ -148,16 +148,17 @@ const AttendantsSearchBar = ({
         </TabPanels>
       </Tabs>
     </div>
-  ); 
-}
+  );
+};
 
 const AttendantsPanel = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
 
-  const URL = "/api/attendant/all"
-    + (name ? `?name=${name}` : "")
-    + (email ? `?email=${email}` : "")
+  const URL =
+    "/api/attendant/all" +
+    (name ? `?name=${name}` : "") +
+    (email ? `?email=${email}` : "");
 
   const searchByName = (name: string) => {
     setName(name);
@@ -183,22 +184,12 @@ const AttendantsPanel = () => {
         searchByEmail={searchByEmail}
       />
       {attendants ? (
-        <AttendantsList attendants={attendants} mutate={mutate} /> 
+        <AttendantsList attendants={attendants} mutate={mutate} />
       ) : (
         <Skeleton height="140px" width="100%" />
       )}
     </div>
   );
-}
+};
 
 export default AttendantsPanel;
-
-
-
-
-
-
-
-
-
-

@@ -64,13 +64,13 @@ const sidebarItems: SidebarItemProps[] = [
     Icon: FaUserDoctor,
     path: "/doctors",
     roles: [Roles.Admin, Roles.Attendant],
-  }, 
+  },
   {
     name: "Atendentes",
     Icon: FaUserTie,
     path: "/attendants",
     roles: [Roles.Admin],
-  }
+  },
 ];
 
 const SidebarItem: FC<SidebarItemProps> = ({ name, Icon, path, isActive }) => {

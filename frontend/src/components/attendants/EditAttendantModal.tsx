@@ -22,7 +22,7 @@ interface EditAttendantModalProps {
   mutate: (args: any) => void;
   attendant: IAttendant;
   attendants: IAttendant[];
-} 
+}
 
 interface FormErrorProps {
   message: string;
@@ -62,28 +62,31 @@ const EditAttendantModal = ({
 
   const filteredAttendants = (updatedId: number) => {
     return attendants.filter((attendant) => attendant.id != updatedId);
-  }
+  };
 
   const onSubmit = async (data: IUpdateAttendant) => {
     const access = session?.user.access_token as string;
     try {
-      const res = await fetch(`${API_URL}/api/attendant/update/${attendant.id}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${access}`,
-        },
-        method: "PATCH",
-        body: JSON.stringify(data),
-      }) 
-      const updatedAttendant  = await res.json();
+      const res = await fetch(
+        `${API_URL}/api/attendant/update/${attendant.id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${access}`,
+          },
+          method: "PATCH",
+          body: JSON.stringify(data),
+        }
+      );
+      const updatedAttendant = await res.json();
       showSuccessToast("Atendente modificado  com sucesso");
       mutate([...filteredAttendants(attendant.id), updatedAttendant]);
       reset();
-      onClose(); 
+      onClose();
     } catch (error: any) {
       showErrorToast("Erro ao modificar atendente", error.message);
-    } 
-  }
+    }
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={{ base: "sm", md: "md" }}>
@@ -91,7 +94,7 @@ const EditAttendantModal = ({
       <ModalContent py="1rem">
         <ModalHeader>
           <h2 className="text-xl font-bold text-description/70">
-            Editar Atendente 
+            Editar Atendente
           </h2>
         </ModalHeader>
         <ModalCloseButton />
@@ -106,7 +109,7 @@ const EditAttendantModal = ({
               </FormLabel>
               <input
                 className={
-                  firstNameValid 
+                  firstNameValid
                     ? `${inputStyle} ${validInput}`
                     : `${inputStyle} ${invalidInput}`
                 }
@@ -124,7 +127,7 @@ const EditAttendantModal = ({
               </FormLabel>
               <input
                 className={
-                  lastNameValid 
+                  lastNameValid
                     ? `${inputStyle} ${validInput}`
                     : `${inputStyle} ${invalidInput}`
                 }
@@ -155,22 +158,22 @@ const EditAttendantModal = ({
               )}
             </FormControl>
             <FormControl isInvalid={birthDateValid} isRequired>
-                <FormLabel className="text-description/70" mb={1}>
-                  Data de Nascimento
-                </FormLabel>
-                <input
-                  className={
-                    birthDateValid 
-                      ? `${inputStyle} ${validInput}`
-                      : `${inputStyle} ${invalidInput}`
-                  }
-                  type="date"
-                  {...register("dbo", { required: true })}
-                />   
-                {!birthDateValid && (
-                  <FormError message="A data de nascimento é necessaria" />
-                )}
-              </FormControl> 
+              <FormLabel className="text-description/70" mb={1}>
+                Data de Nascimento
+              </FormLabel>
+              <input
+                className={
+                  birthDateValid
+                    ? `${inputStyle} ${validInput}`
+                    : `${inputStyle} ${invalidInput}`
+                }
+                type="date"
+                {...register("dbo", { required: true })}
+              />
+              {!birthDateValid && (
+                <FormError message="A data de nascimento é necessaria" />
+              )}
+            </FormControl>
             <div className="flex py-2 gap-3">
               <Button ml="auto" size="sm" colorScheme="red" onClick={onClose}>
                 Fechar
@@ -183,7 +186,7 @@ const EditAttendantModal = ({
         </ModalBody>
       </ModalContent>
     </Modal>
-  )
-}
+  );
+};
 
 export default EditAttendantModal;

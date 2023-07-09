@@ -44,7 +44,7 @@ const CreateAttendantModal = ({
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ICreateAttendant>({ mode: "onBlur" }); 
+  } = useForm<ICreateAttendant>({ mode: "onBlur" });
 
   const { data: session } = useSession();
   const { showSuccessToast, showErrorToast } = useCustomToast();
@@ -57,7 +57,7 @@ const CreateAttendantModal = ({
   const inputStyle = "px-2 py-1 w-full text-description/70 rounded-lg";
   const validInput = "border border-primary focus:outline-primary";
   const invalidInput = "border border-accent focus:outline-accent";
-  
+
   const onSubmit = async (data: ICreateAttendant) => {
     const access = session?.user.access_token as string;
     try {
@@ -68,16 +68,16 @@ const CreateAttendantModal = ({
         },
         method: "POST",
         body: JSON.stringify(data),
-      }) 
+      });
       const newAttendant = await res.json();
       showSuccessToast("Atendente criado com sucesso");
       mutate([...attendants, newAttendant]);
       reset();
-      onClose(); 
+      onClose();
     } catch (error: any) {
       showErrorToast("Erro ao criar atendente", error.message);
-    } 
-  }
+    }
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={{ base: "sm", md: "md" }}>
@@ -85,7 +85,7 @@ const CreateAttendantModal = ({
       <ModalContent py="1rem">
         <ModalHeader>
           <h2 className="text-xl font-bold text-description/70">
-            Criar Atendente 
+            Criar Atendente
           </h2>
         </ModalHeader>
         <ModalCloseButton />
@@ -100,7 +100,7 @@ const CreateAttendantModal = ({
               </FormLabel>
               <input
                 className={
-                  firstNameValid 
+                  firstNameValid
                     ? `${inputStyle} ${validInput}`
                     : `${inputStyle} ${invalidInput}`
                 }
@@ -118,7 +118,7 @@ const CreateAttendantModal = ({
               </FormLabel>
               <input
                 className={
-                  lastNameValid 
+                  lastNameValid
                     ? `${inputStyle} ${validInput}`
                     : `${inputStyle} ${invalidInput}`
                 }
@@ -149,22 +149,22 @@ const CreateAttendantModal = ({
               )}
             </FormControl>
             <FormControl isInvalid={birthDateValid} isRequired>
-                <FormLabel className="text-description/70" mb={1}>
-                  Data de Nascimento
-                </FormLabel>
-                <input
-                  className={
-                    birthDateValid 
-                      ? `${inputStyle} ${validInput}`
-                      : `${inputStyle} ${invalidInput}`
-                  }
-                  type="date"
-                  {...register("dbo", { required: true })}
-                />   
-                {!birthDateValid && (
-                  <FormError message="A data de nascimento é necessaria" />
-                )}
-              </FormControl> 
+              <FormLabel className="text-description/70" mb={1}>
+                Data de Nascimento
+              </FormLabel>
+              <input
+                className={
+                  birthDateValid
+                    ? `${inputStyle} ${validInput}`
+                    : `${inputStyle} ${invalidInput}`
+                }
+                type="date"
+                {...register("dbo", { required: true })}
+              />
+              {!birthDateValid && (
+                <FormError message="A data de nascimento é necessaria" />
+              )}
+            </FormControl>
             <div className="flex py-2 gap-3">
               <Button ml="auto" size="sm" colorScheme="red" onClick={onClose}>
                 Fechar
@@ -177,13 +177,7 @@ const CreateAttendantModal = ({
         </ModalBody>
       </ModalContent>
     </Modal>
-  )
-}
+  );
+};
 
 export default CreateAttendantModal;
-
-
-
-
-
-

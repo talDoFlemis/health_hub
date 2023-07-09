@@ -15,7 +15,11 @@ interface AttendantCardProps {
   mutate: (args: any) => void;
 }
 
-const AttendantCard = ({ attendant, attendants, mutate }: AttendantCardProps) => {
+const AttendantCard = ({
+  attendant,
+  attendants,
+  mutate,
+}: AttendantCardProps) => {
   const {
     isOpen: isEditOpen,
     onOpen: onEditOpen,
@@ -26,19 +30,19 @@ const AttendantCard = ({ attendant, attendants, mutate }: AttendantCardProps) =>
     onOpen: onDeleteOpen,
     onClose: onDeleteClose,
   } = useDisclosure();
-  
-  const attendantName = `${attendant.firstname} ${attendant.lastname}`
+
+  const attendantName = `${attendant.firstname} ${attendant.lastname}`;
 
   return (
     <>
-      <EditAttendantModal 
+      <EditAttendantModal
         isOpen={isEditOpen}
         onClose={onEditClose}
         mutate={mutate}
         attendant={attendant}
         attendants={attendants}
       />
-      <DeleteAttendantAlert 
+      <DeleteAttendantAlert
         id={attendant.id}
         name={attendantName}
         isOpen={isDeleteOpen}
@@ -56,10 +60,10 @@ const AttendantCard = ({ attendant, attendants, mutate }: AttendantCardProps) =>
         <button className="self-start" onClick={onDeleteOpen}>
           <AiOutlineClose className="text-sm text-description/70 hover:text-accent" />
         </button>
-      </div> 
+      </div>
     </>
-  ) 
-}
+  );
+};
 
 interface AttendantsListProps {
   attendants: IAttendant[];
@@ -71,7 +75,7 @@ const AttendantsList = ({ attendants, mutate }: AttendantsListProps) => {
 
   return (
     <div className="grid w-full gap-2 rounded-lg bg-white px-4 py-4 shadow-lg lg:grid-cols-2">
-      <CreateAttendantModal 
+      <CreateAttendantModal
         attendants={attendants}
         mutate={mutate}
         isOpen={isOpen}
@@ -104,20 +108,7 @@ const AttendantsList = ({ attendants, mutate }: AttendantsListProps) => {
         </span>
       )}
     </div>
-  )
-}
+  );
+};
 
 export default AttendantsList;
-
-
-
-
-
-
-
-
-
-
-
-
-
