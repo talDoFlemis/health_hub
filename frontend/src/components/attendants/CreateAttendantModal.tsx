@@ -15,6 +15,7 @@ import { API_URL } from "@/utils/constants";
 import { IAttendant, ICreateAttendant } from "@/types/attendant";
 import { useSession } from "next-auth/react";
 import useCustomToast from "@/hooks/useCustomToast";
+import moment from "moment";
 
 interface CreateAttendantProps {
   isOpen: boolean;
@@ -69,6 +70,7 @@ const CreateAttendantModal = ({
         method: "POST",
         body: JSON.stringify(data),
       });
+      if (!res.ok) throw new Error();
       const newAttendant = await res.json();
       showSuccessToast("Atendente criado com sucesso");
       mutate([...attendants, newAttendant]);
@@ -159,13 +161,14 @@ const CreateAttendantModal = ({
                     : `${inputStyle} ${invalidInput}`
                 }
                 type="date"
+                max={moment().format("YYYY-MM-DD")}
                 {...register("dbo", { required: true })}
               />
               {!birthDateValid && (
                 <FormError message="A data de nascimento é necessaria" />
               )}
             </FormControl>
-            <div className="flex py-2 gap-3">
+            <div className="flex gap-3 py-2">
               <Button ml="auto" size="sm" colorScheme="red" onClick={onClose}>
                 Fechar
               </Button>
