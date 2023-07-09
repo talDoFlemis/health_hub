@@ -2,6 +2,7 @@ import Head from "next/head";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import type { NextPageWithLayout } from "./_app";
 import { ReactElement } from "react";
+import AttendantsPanel from "@/components/attendants/AttendantsPanel";
 
 const Attendants: NextPageWithLayout = () => {
   return (
@@ -11,6 +12,7 @@ const Attendants: NextPageWithLayout = () => {
       </Head>
       <main className="min-h-screen w-full py-4 px-2">
         <h1 className="text-primary text-5xl font-bold mb-4">Buscar</h1>
+        <AttendantsPanel />
       </main>
     </>
   )

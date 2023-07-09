@@ -7,5 +7,5 @@ export interface IAttendant {
   age: integer;
 } 
 
-export type ICreateAttendant = Omit<IAttendant, "id">;
+export type ICreateAttendant = Omit<IAttendant, "id" | "age">;
 export type IUpdateAttendant = ICreateAttendant;
