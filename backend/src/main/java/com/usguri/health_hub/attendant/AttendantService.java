@@ -4,7 +4,10 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,8 +15,18 @@ import org.springframework.stereotype.Service;
 public class AttendantService {
   private final AttendantRepository attendantRepository;
 
-  public List<Attendant> getAll() {
-    return this.attendantRepository.findAll();
+  public List<Attendant> getAll(Optional<String> name, Optional<String> email) {
+    Attendant attendant =
+        Attendant.builder().firstname(name.orElse(null)).email(email.orElse(null)).build();
+    Example<Attendant> probe =
+        Example.of(
+            attendant,
+            ExampleMatcher.matchingAll()
+                .withIgnoreCase()
+                .withStringMatcher(ExampleMatcher.StringMatcher.STARTING)
+                .withIgnoreNullValues());
+
+    return this.attendantRepository.findAll(probe);
   }
 
   private Attendant findUserById(Long id) {
