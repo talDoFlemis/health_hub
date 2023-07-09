@@ -19,15 +19,29 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Serviço responsável por lidar com as operações de autenticação e autorização.
+ *
+ * @author Said Rodrigues
+ * @version 1.0
+ * @since 2023-07-04
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
+
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
   private final TokenRepository tokenRepository;
 
+  /**
+   * Registra um novo usuário.
+   *
+   * @param req Os dados de registro do usuário.
+   * @return A resposta de autenticação contendo o token de acesso.
+   */
   public AuthenticationResponse register(RegisterRequest req) {
     var user =
         User.builder()
@@ -47,6 +61,12 @@ public class AuthenticationService {
         .build();
   }
 
+  /**
+   * Autentica um usuário.
+   *
+   * @param req Os dados de autenticação do usuário.
+   * @return A resposta de autenticação contendo o token de acesso.
+   */
   public AuthenticationResponse authenticate(AuthenticationRequest req) {
     authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));
@@ -88,6 +108,13 @@ public class AuthenticationService {
     tokenRepository.save(token);
   }
 
+  /**
+   * Atualiza o token de acesso.
+   *
+   * @param request A solicitação HTTP.
+   * @param response A resposta HTTP.
+   * @throws IOException Se ocorrer um erro ao atualizar o token de acesso.
+   */
   public void refreshToken(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
     final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -117,6 +144,12 @@ public class AuthenticationService {
     }
   }
 
+  /**
+   * Obtém os detalhes do usuário atualmente autenticado.
+   *
+   * @param email O email do usuário autenticado.
+   * @return Os detalhes do usuário.
+   */
   public User getMyUserDetails(String email) {
     User userFromDb =
         userRepository
