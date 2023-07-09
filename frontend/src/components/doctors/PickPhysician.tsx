@@ -41,24 +41,28 @@ const PickPhysician = ({ physicians, setSelectedPhysicianId, notFoundMsg }: Pick
   const notFoundMensage = notFoundMsg ?? "Nenhum médico encontrado..."
 
   return (
-    <div className="grid w-full gap-2 rounded-lg bg-white px-4 py-4 shadow-lg lg:grid-cols-2">
-      <div className="flex items-center lg:col-span-full">
-        <h1 className="mb-4 text-5xl font-bold text-primary">Médicos</h1>
-      </div>
+    <div className="w-full rounded-lg border border-description/30">
+      {/*<div className="flex items-center lg:col-span-full">*/}
+      {/*  <h1 className="mb-4 text-5xl font-bold text-primary">Médicos</h1>*/}
+      {/*</div>*/}
       {(physicians && physicians.length > 0) ? (
-        physicians.map((physician) => {
-          return (
-            <PickDoctorCard
-              key={physician.id}
-              physician={physician}
-              setSelectedPhysicianId={setSelectedPhysicianId}
-            />
-          );
-        })
+        <div className="grid w-full gap-2 px-4 py-4 lg:grid-cols-2">
+          {physicians.map((physician) => {
+            return (
+              <PickDoctorCard
+                key={physician.id}
+                physician={physician}
+                setSelectedPhysicianId={setSelectedPhysicianId}
+              />
+            );
+          })}
+        </div>
       ) : (
-        <span className="py-4 px-2 text-description/70 text-xl">
-          {notFoundMensage}
-        </span>
+        <div className="grid w-full gap-2 px-4 py-4">
+          <span className="w-full py- px-4 text-description/70 text-xl">
+            {notFoundMensage}
+          </span>
+        </div>
       )}
     </div>
   );

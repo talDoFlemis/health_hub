@@ -18,16 +18,15 @@ import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { IAppointment, ICreateAppointment } from "@/types/appointment";
 import { SPECIALTIES, CLIENT_SPECIALITES } from "@/utils/constants";
-import DoctorsPanel, {DoctorsSearchBar} from "@/components/doctors/DoctorsPanel"
-import { Calendar, momentLocalizer } from "react-big-calendar";
-import moment from "moment/moment";
-import {useState} from "react";
-import {IPhysician, Specialty} from "@/types/physician";
+import moment, {Moment} from "moment/moment";
+import React, { useState } from "react";
+import { IPhysician, Specialty } from "@/types/physician";
 import PickPhysician from "@/components/doctors/PickPhysician";
-import {Simulate} from "react-dom/test-utils";
-import select = Simulate.select;
-import {useCustomQuery} from "@/hooks/useCustomQuery";
-import DoctorsList from "@/components/doctors/DoctorsList";
+import { Simulate } from "react-dom/test-utils";
+import { useCustomQuery } from "@/hooks/useCustomQuery";
+import {mockSession} from "next-auth/client/__tests__/helpers/mocks";
+import {Calendar, Messages, momentLocalizer} from "react-big-calendar";
+import {useRouter} from "next/router";
 
 interface ICreateAppointmentModalProps {
   isOpen: boolean;
@@ -57,6 +56,7 @@ const CreateAppointment = ({
   } = useForm<ICreateAppointment>({ mode: "onBlur" });
   const { data: session } = useSession();
   const { showSuccessToast, showErrorToast } = useCustomToast();
+  const router = useRouter();
 
   const onSubmit = async (pat: ICreateAppointment) => {
     const access = session?.user.access_token as string;
@@ -80,16 +80,118 @@ const CreateAppointment = ({
       onClose();
   };
 
-
-
   const [selectedPhysicianId, setSelectedPhysicianId] = useState<number | undefined>(undefined)
-  const makeURL = (specialty: string | null, name: string | null) => (
+  const physicianPickMakeURL = (specialty: string | null, name: string | null) => (
     "/api/physician" +
     (specialty ? `?specialty=${specialty}` : "") +
     (name ? `?name=${name}` : ""));
 
-  const [URL, setURL] = useState(makeURL("", ""));
-  const {data: doctors, mutate} = useCustomQuery<IPhysician[]>(URL);
+  const [physicianBySpcltURL, setPhysicianBySpcltURL] = useState(
+    physicianPickMakeURL("", "")
+  );
+  const { data: doctors} = useCustomQuery<IPhysician[]>(physicianBySpcltURL);
+
+  // const physicianAppointmentsMakeURL = (physicianId: number | undefined) => (
+  //     `/api/appointment/physician/${physicianId?.toString()}`
+  //   );
+  // const [physicianAppointmentsURL, setPhysicianAppointmentsURL] = useState<string>(
+  //   (physicianAppointmentsMakeURL(
+  //     selectedPhysicianId
+  //   ))
+  // );
+  //
+  // const { data: physicianAppointments } = useCustomQuery<IAppointment[]>(physicianAppointmentsURL);
+
+  const freeAppointmentsEventsCalc = (
+      RangeOfDays: number,
+      physicianId: number
+      ) => {
+    const firstValidHour = 8;
+    const hoursWorkedPerDay = 10;
+    const lastValidHour = firstValidHour + hoursWorkedPerDay;
+
+    const appointmentMinutesStart = 0
+    const MinutesPerAppointment = 50
+    const appointmentMinutesEnd = appointmentMinutesStart + MinutesPerAppointment
+
+    const firstValidDay = moment().startOf("day").add(1, "day");
+    const lastValidDay = moment(firstValidDay).add(RangeOfDays, "day");
+
+    const events: {
+      id: number,
+      title: string,
+      start: Date,
+      end: Date
+    }[] = [];
+    const OpenAppointmentsMatrix: boolean[][] = new Array(RangeOfDays)
+                                   .fill(false)
+                                   .map(() =>
+                                     new Array(hoursWorkedPerDay).fill(true)
+                                   );
+
+    const physicianAppointments = appointments.filter((appointment) => appointment.physicianId == physicianId)
+    physicianAppointments.forEach((appointment) => {
+      const appointmentMoment = moment(new Date(appointment.time));
+      const appointmentHour = appointmentMoment.hour();
+
+      if (
+        (
+          appointmentMoment.isAfter(firstValidDay) &&
+          appointmentMoment.isBefore(lastValidDay)
+        ) && (
+          appointmentHour >= firstValidHour &&
+          appointmentHour <= lastValidHour
+        )
+      ) {
+        const dayIndex = appointmentMoment.diff(firstValidDay, "days");
+        const hourIndex = appointmentHour - firstValidHour;
+
+        if (OpenAppointmentsMatrix[dayIndex][hourIndex]) {
+         OpenAppointmentsMatrix[dayIndex][hourIndex] = false;
+         events.push(
+           {
+            id: appointment.id,
+            title: appointment.patient.firstname + " • " + appointment.physician.name,
+            start: new Date(appointment.time),
+            end: moment(appointment.time).add(1, "hour").toDate(),
+          }
+         )
+        }
+      }
+    })
+
+    return {
+      events: events,
+      firstDay: firstValidDay,
+      lastDay: lastValidDay
+    };
+  }
+
+  const messages: Messages = {
+    allDay: "Dia inteiro",
+    previous: "<",
+    next: ">",
+    today: "Hoje",
+    month: "Mês",
+    week: "Semana",
+    day: "Dia",
+    agenda: "Agenda",
+    date: "Data",
+    time: "Hora",
+    event: "Evento",
+  };
+
+  const [limitDays, setLimitDays] = useState<{
+    firstDay: Moment,
+    lastDay: Moment
+  } | undefined>(undefined)
+
+  const [events, setEvents] = useState<{
+      id: number,
+      title: string,
+      start: Date,
+      end: Date
+    }[] | undefined>(undefined);
 
   return (
     <>
@@ -113,11 +215,13 @@ const CreateAppointment = ({
                   placeholder="Escolha a especialidade do médico"
                   {...register("specialty", { required: true,
                     onChange: event => {
-                      setURL(
-                        makeURL(
+                      setEvents(undefined);
+                      setSelectedPhysicianId(undefined);
+                      setPhysicianBySpcltURL(
+                        physicianPickMakeURL(
                           event.target.value, null
                         )
-                      )
+                      );
                     }
                   })}
                 >
@@ -139,16 +243,29 @@ const CreateAppointment = ({
 
               <FormControl isInvalid={!!errors.physicianId} isRequired>
                 <FormLabel className="text-description/70" mb={1}>
-                  Escolha o médico de sua preferência
+                  Escolha um médico:
                 </FormLabel>
 
                   <PickPhysician
                     setSelectedPhysicianId={(id: number) => {
                       setSelectedPhysicianId(id);
+                      const freeApp = freeAppointmentsEventsCalc(
+                        15,
+                        Number(selectedPhysicianId)
+                      );
+
+                      setLimitDays({
+                        firstDay: freeApp.firstDay,
+                        lastDay: freeApp.lastDay
+                      })
+
+                      setEvents(
+                        freeApp.events
+                      );
                       setValue('physicianId', id);
                     }}
                     physicians={getValues("specialty") ? (doctors as []) : [] }
-                    notFoundMsg={!getValues("specialty") ? "É preciso escolher uma especialidade" : undefined}
+                    notFoundMsg={!getValues("specialty") ? "É preciso escolher uma especialidade primeiro" : undefined}
                   />
 
                 {!!errors.physicianId && (
@@ -159,8 +276,20 @@ const CreateAppointment = ({
 
               <FormControl isInvalid={!!errors.time} isRequired>
                 <FormLabel className="text-description/70" mb={1}>
-                  Data(Match physician)
+                  Escolha uma data
                 </FormLabel>
+                {(events && limitDays) ? (
+                    <Calendar
+                      localizer={momentLocalizer(moment)}
+                      events={events}
+                      startAccessor={limitDays.firstDay.toDate}
+                      endAccessor={limitDays.lastDay.toDate}
+                    />
+                  ) : (
+                    <span className="py-4 px-2 text-description/70 text-xl">
+                      {"Escolha um médico antes"}
+                    </span>
+                  )}
               </FormControl>
             </form>
           </ModalBody>
