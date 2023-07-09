@@ -3,14 +3,11 @@ package com.usguri.health_hub.attendant;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import javax.swing.text.html.Option;
 
 @RestController
 @RequestMapping(path = "${apiPrefix}/attendant")
@@ -25,7 +22,8 @@ public class AttendantController {
 
   @GetMapping("/all")
   @PreAuthorize(value = "hasAnyRole('ADMIN')")
-  public List<Attendant> getAllAttendants(@RequestParam Optional<String> name, @RequestParam Optional<String> email) {
+  public List<Attendant> getAllAttendants(
+      @RequestParam Optional<String> name, @RequestParam Optional<String> email) {
     return this.attendantService.getAll(name, email);
   }
 
