@@ -15,6 +15,18 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
+/**
+ * Configuração de segurança do Spring Security.
+ *
+ * <p>Esta classe define as configurações de segurança para a aplicação Spring Boot voltada para uma
+ * clínica médica. Ela define as regras de autorização para os endpoints da API, configura a
+ * autenticação baseada em tokens JWT e define as permissões necessárias para acessar os recursos do
+ * sistema.
+ *
+ * @author Said Rodrigues
+ * @version 1.0
+ * @since 2023-07-04
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -24,6 +36,13 @@ public class SecurityConfiguration {
   private final AuthenticationProvider authenticationProvider;
   private final LogoutHandler logoutHandler;
 
+  /**
+   * Configura o filtro de segurança.
+   *
+   * @param httpSecurity O objeto HttpSecurity usado para configurar as regras de segurança.
+   * @return O objeto SecurityFilterChain configurado.
+   * @throws Exception Se ocorrer um erro durante a configuração do filtro de segurança.
+   */
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
     httpSecurity
