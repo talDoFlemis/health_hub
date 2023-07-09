@@ -218,7 +218,7 @@ const AttendantsPanel = () => {
         searchByEmail={searchByEmail}
       />
       {attendants ? (
-        <AttendantsList attendants={mockAttendants} mutate={mutate} /> 
+        <AttendantsList attendants={attendants} mutate={mutate} /> 
       ) : (
         <Skeleton height="140px" width="100%" />
       )}

@@ -5,6 +5,7 @@ import { useDisclosure } from "@chakra-ui/react";
 import { AiOutlineClose } from "react-icons/ai";
 import { BiPencil } from "react-icons/bi";
 import { IAttendant } from "@/types/attendant";
+import CreateAttendantModal from "./CreateAttendantModal";
 
 interface AttendantCardProps {
   attendant: IAttendant;
@@ -40,12 +41,21 @@ interface AttendantsListProps {
 }
 
 const AttendantsList = ({ attendants, mutate }: AttendantsListProps) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
     <div className="grid w-full gap-2 rounded-lg bg-white px-4 py-4 shadow-lg lg:grid-cols-2">
+      <CreateAttendantModal 
+        attendants={attendants}
+        mutate={mutate}
+        isOpen={isOpen}
+        onClose={onClose}
+      />
       <div className="flex items-center lg:col-span-full">
         <h1 className="mb-4 text-5xl font-bold text-primary">Atendentes</h1>
         <button
           className="ml-auto flex gap-2 rounded-lg bg-green-500 px-4 py-2"
+          onClick={onOpen}
         >
           <span className="text-sm text-white">Novo</span>
           <AiOutlinePlus className="text-white" size="1.25rem" />
