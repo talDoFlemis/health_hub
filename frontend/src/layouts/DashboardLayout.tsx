@@ -12,6 +12,8 @@ interface DashboardLayoutProps {
   children: ReactElement;
 }
 
+// Esse é layout padrão para todas as páginas da aplicação com excessão das páginas
+// de acesso.
 const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { pathname } = useRouter();

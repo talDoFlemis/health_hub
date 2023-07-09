@@ -1,5 +1,7 @@
 import { useToast } from "@chakra-ui/react";
 
+// Hook que retorna o componente toast, consiste em uma notificação
+// para o usuário a respeito do sucesso ou falha de uma ação.
 const useCustomToast = () => {
   const toast = useToast();
 

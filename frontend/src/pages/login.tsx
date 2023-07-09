@@ -90,7 +90,7 @@ const Login = () => {
   return (
     <>
       <Head>
-        <title>Health Hub - Login</title>
+        <title>Health Hub • Login</title>
       </Head>
       <main className="flex min-h-screen w-full items-center justify-center bg-gray-200">
         <LoginForm />

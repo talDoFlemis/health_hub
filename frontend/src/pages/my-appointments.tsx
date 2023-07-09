@@ -36,7 +36,7 @@ const MyAppointments: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Minhas Consultas • Health Hub</title>
+        <title>Health Hub • Minhas Consultas</title>
       </Head>
       <main className="flex flex-col p-8">
         <div className="flex flex-col gap-4 rounded-lg bg-white p-8 shadow-lg">
