@@ -8,7 +8,7 @@ const Doctors: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Health Hub - Doctors</title>
+        <title>Health Hub - Médicos</title>
       </Head>
       <main className="min-h-screen w-full py-4 px-2">
         <h1 className="text-primary text-5xl font-bold mb-4">Buscar</h1>
