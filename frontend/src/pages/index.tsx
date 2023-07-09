@@ -11,9 +11,10 @@ import { IAppointment } from "@/types/appointment";
 import { useRouter } from "next/router";
 import { BsFillCalendarPlusFill } from "react-icons/bs";
 import CreateAppointment from "@/components/appointments/CreateAppointment"
+import {mutate} from "swr";
 
 const Home: NextPageWithLayout = () => {
-  const { data: appointments } = useCustomQuery<IAppointment[]>(
+  const { data: appointments, mutate } = useCustomQuery<IAppointment[]>(
     "/api/appointment/all"
   );
   const router = useRouter();
@@ -47,11 +48,14 @@ const Home: NextPageWithLayout = () => {
       <Head>
         <title>Health Hub</title>
       </Head>
-      <CreateAppointment
-        isOpen={isOpen}
-        onClose={onClose}
-        appointments={appointments ?? []}
-      />
+      {appointments && (
+          <CreateAppointment
+          isOpen={isOpen}
+          onClose={onClose}
+          appointments={appointments ?? []}
+          mutate={mutate}
+        />)
+      }
       <main className="flex flex-col p-8">
         <div className="flex flex-col gap-4 rounded-lg bg-white p-8 shadow-lg">
           <div className="flex flex-wrap items-center justify-between">

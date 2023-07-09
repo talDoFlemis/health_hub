@@ -2,6 +2,7 @@ import useCustomToast from "@/hooks/useCustomToast";
 import {ICreatePatient, IPatient} from "@/types/patient";
 import { API_URL } from "@/utils/constants";
 import {
+  background,
   Button,
   FormControl,
   FormLabel,
@@ -28,88 +29,13 @@ import {mockSession} from "next-auth/client/__tests__/helpers/mocks";
 import {Calendar, Messages, momentLocalizer} from "react-big-calendar";
 import {useRouter} from "next/router";
 import {pairs} from "yaml/dist/schema/yaml-1.1/pairs";
+import {hours} from "date-arithmetic";
 
 interface ICreateAppointmentModalProps {
   isOpen: boolean;
   onClose: () => void;
   appointments: IAppointment[];
-}
-
-const freeAppointmentsEventsCalc = (
-    RangeOfDays: number,
-    physicianId: number,
-    appointments: IAppointment[]
-    ) => {
-  const firstValidHour = 8;
-  const hoursWorkedPerDay = 10;
-  const lastValidHour = firstValidHour + hoursWorkedPerDay;
-
-  const appointmentMinutesStart = 0
-  const MinutesPerAppointment = 50
-  const appointmentMinutesEnd = appointmentMinutesStart + MinutesPerAppointment
-
-  const firstValidDay = moment(Date.now()).startOf("day").add(1, "day");
-  const lastValidDay = moment(firstValidDay).add(RangeOfDays, "day");
-
-  const events: {
-    id: number,
-    title: string,
-    start: Date,
-    end: Date
-  }[] = [];
-  const OpenAppointmentsMatrix: boolean[][] = new Array(RangeOfDays)
-                                 .fill(false)
-                                 .map(() =>
-                                   new Array(hoursWorkedPerDay).fill(true)
-                                 );
-
-  const physicianAppointments = appointments.filter((appointment) => appointment.physicianId == physicianId)
-  physicianAppointments.forEach((appointment) => {
-    const appointmentMoment = moment(new Date(appointment.time));
-    const appointmentHour = appointmentMoment.startOf("hour").hour();
-
-    if (
-      (
-        appointmentMoment.isAfter(firstValidDay) &&
-        appointmentMoment.isBefore(lastValidDay)
-      ) && (
-        appointmentHour >= firstValidHour &&
-        appointmentHour <= lastValidHour
-      )
-    ) {
-      const dayIndex = appointmentMoment.diff(firstValidDay, "days");
-      const hourIndex = appointmentHour - firstValidHour;
-
-      if (OpenAppointmentsMatrix[dayIndex][hourIndex]) {
-        OpenAppointmentsMatrix[dayIndex][hourIndex] = false;
-      }
-    }
-  })
-
-  OpenAppointmentsMatrix.forEach(
-    (column, i) => column.forEach(
-      (free, j) => {
-        if (free) {
-          const startMoment = moment(firstValidDay).add(i, "days").add(j + firstValidHour, "hours");
-
-          events.push(
-           {
-            id: j + i*hoursWorkedPerDay,
-            title: "Horario Livre",
-            start: startMoment.toDate(),
-            end: startMoment.add(1, "hours").toDate(),
-          }
-         )
-        }
-      }
-    )
-  )
-
-  return {
-    events: events,
-    firstDay: firstValidDay,
-    lastDay: lastValidDay
-  };
+  mutate: (args: any) => void;
 }
 
 const messages: Messages = {
@@ -140,7 +66,8 @@ const physicianPickMakeURL = (specialty: string | null, name: string | null) => 
 const CreateAppointment = ({
   isOpen,
   onClose,
-  appointments
+  appointments,
+  mutate
   }: ICreateAppointmentModalProps) => {
   const {
     register,
@@ -149,42 +76,126 @@ const CreateAppointment = ({
     getValues,
     reset,
     formState: { errors, isLoading},
-  } = useForm<InputToCreateAppointment>({ mode: "onBlur" });
+  } = useForm<ICreateAppointment>({ mode: "onBlur" });
   const { data: session } = useSession();
   const { showSuccessToast, showErrorToast } = useCustomToast();
   const router = useRouter();
 
-  const onSubmit = async (pat: InputToCreateAppointment) => {
+  const closeAndClear = () => {
+        reset();
+        onClose();
+  };
 
-
-    const newAppointment: ICreateAppointment = {
-      patientId: pat.patientId,
-      physicianId: pat.physicianId,
-      time: moment(pat.appointmentDay).add(pat.appointHour, "hours").toISOString(),
-      annotations: pat.annotations,
+  const onSubmit = async (data: ICreateAppointment) => {
+    const formatedData = {
+      annotations: data.annotations ?? "",
+      patient_id: data.patientId,
+      physician_id: data.physicianId,
+      time: data.time
     }
 
     const access = session?.user.access_token as string;
     try {
 
-      const res = await fetch(`${API_URL}/appointment/CreateAppointmentDTO.java`, {
+      const res = await fetch(`${API_URL}/api/appointment/create`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${access}`,
         },
         method: "POST",
-        body: JSON.stringify(pat),
+        body: JSON.stringify(formatedData),
       });
-      showSuccessToast("Consulta marcada com sucesso");
-      closeAndClear();
+      const newApp = await res.json();
+      showSuccessToast("Médico criado com sucesso");
+      mutate([...appointments, newApp]);
+      reset();
+      onClose();
     } catch (error: any) {
       showErrorToast("Não foi possível marcar sua consulta", error.message);
     }
   };
-  const closeAndClear = () => {
-      reset();
-      onClose();
+
+  const freeAppointmentsEventsCalc = (
+    RangeOfDays: number,
+    physicianId: number | undefined
+    ) => {
+  const firstValidHour = 8;
+  const hoursWorkedPerDay = 10;
+  const lastValidHour = firstValidHour + hoursWorkedPerDay;
+
+  const appointmentMinutesStart = 0
+  const MinutesPerAppointment = 50
+  const appointmentMinutesEnd = appointmentMinutesStart + MinutesPerAppointment
+
+  const firstValidDay = moment().startOf("day").add(1, "day");
+  const lastValidDay = moment(firstValidDay).add(RangeOfDays, "day");
+
+  const events: {
+    id: number,
+    title: string,
+    start: Date,
+    end: Date
+  }[] = [];
+
+  const OpenAppointmentsMatrix: boolean[][] = new Array(RangeOfDays)
+                                 .fill(false)
+                                 .map(() =>
+                                   new Array(hoursWorkedPerDay).fill(true)
+                                 );
+
+  const physicianAppointments = appointments.filter(
+    (appointment) => (
+      physicianId && appointment.physicianId === physicianId
+    ));
+
+  physicianAppointments.forEach((appointment) => {
+    const appointmentMoment = moment(new Date(appointment.time));
+    const appointmentHour = appointmentMoment.startOf("hour").hour();
+
+    if (
+      (
+        appointmentMoment.isAfter(firstValidDay) &&
+        appointmentMoment.isBefore(lastValidDay)
+      ) && (
+        appointmentHour >= firstValidHour &&
+        appointmentHour <= lastValidHour
+      )
+    ) {
+      const dayIndex = appointmentMoment.diff(firstValidDay, "days");
+      const hourIndex = appointmentHour - firstValidHour;
+
+      if (OpenAppointmentsMatrix[dayIndex][hourIndex]) {
+        OpenAppointmentsMatrix[dayIndex][hourIndex] = false;
+        console.log(appointment);
+      }
+    }
+  })
+
+  OpenAppointmentsMatrix.forEach(
+    (column, i) => column.forEach(
+      (free, j) => {
+        if (free) {
+          const startMoment = moment(firstValidDay).add(i, "days").add(j + firstValidHour, "hours");
+
+          events.push(
+           {
+            id: j + i*hoursWorkedPerDay,
+            title: "Horario Livre",
+            start: startMoment.toDate(),
+            end: startMoment.add(1, "hours").toDate(),
+          }
+         )
+        }
+      }
+    )
+  )
+
+  return {
+    events: events,
+    firstDay: firstValidDay,
+    lastDay: lastValidDay
   };
+}
 
   const [selectedPhysicianId, setSelectedPhysicianId] = useState<number | undefined>(undefined)
 
@@ -192,8 +203,6 @@ const CreateAppointment = ({
     physicianPickMakeURL("", "")
   );
   const { data: doctors} = useCustomQuery<IPhysician[]>(physicianBySpcltURL);
-
-  const [selectedPatientName, setSelectedPatientName] = useState<string | undefined>(undefined)
 
   const { data: patients } =
     useCustomQuery<IPatient[]>("/api/patient/all");
@@ -208,11 +217,21 @@ const CreateAppointment = ({
       title: string,
       start: Date,
       end: Date
-    }[] | undefined>(undefined);
+    }[] | undefined>(freeAppointmentsEventsCalc(
+      15,
+      selectedPhysicianId
+  ).events);
+
+  const [selectedEvent, setSelectedEvent] = useState< {
+      id: number,
+      title: string,
+      start: Date,
+      end: Date
+    } | undefined>(undefined);
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} isCentered size="2xl">
+      <Modal isOpen={isOpen} onClose={onClose} isCentered size="4xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader fontSize="2xl">Marcar Consulta</ModalHeader>
@@ -262,11 +281,12 @@ const CreateAppointment = ({
                     onChange: event => {
                       setEvents(undefined);
                       setLimitDays(undefined);
-
+                      setSelectedEvent(undefined);
                       setSelectedPhysicianId(undefined);
+
                       setPhysicianBySpcltURL(
                         physicianPickMakeURL(
-                          event.target.value, null
+                          event.target.value, ""
                         )
                       );
                     }
@@ -296,10 +316,10 @@ const CreateAppointment = ({
                   <PickPhysician
                     setSelectedPhysicianId={(id: number) => {
                       setSelectedPhysicianId(id);
+                      setValue('physicianId', id);
                       const freeApp = freeAppointmentsEventsCalc(
                         15,
-                        Number(selectedPhysicianId),
-                        appointments
+                        Number(selectedPhysicianId)
                       );
 
                       setLimitDays({
@@ -310,7 +330,6 @@ const CreateAppointment = ({
                       setEvents(
                         freeApp.events
                       );
-                      setValue('physicianId', id);
                     }}
                     physicians={getValues("specialty") ? (doctors as []) : [] }
                     notFoundMsg={!getValues("specialty") ? "É preciso escolher uma especialidade primeiro" : undefined}
@@ -322,11 +341,11 @@ const CreateAppointment = ({
               </FormControl>
 
 
-              <FormControl isInvalid={!!errors.appointHour || !!errors.appointmentDay} isRequired>
+              <FormControl isInvalid={!!errors.time} isRequired>
                 <FormLabel className="text-description/70" mb={1}>
-                  Escolha uma data
+                  Escolha uma data {selectedEvent?.start.toString()}
                 </FormLabel>
-                {(events && limitDays) ? (
+                {(events && limitDays && getValues("physicianId")) ? (
                   <div className="h-[70vh]">
                     <Calendar
                       localizer={momentLocalizer(moment)}
@@ -334,20 +353,14 @@ const CreateAppointment = ({
                       startAccessor="start"
                       endAccessor="end"
                       messages={messages}
-                      defaultView={getValues("appointmentDay") ?
-                        "day" : "month"
-                      }
+                      defaultView={"week"}
+                      selected={selectedEvent}
                       onSelectEvent={
-                        (event, background ) => {
-                          if (getValues("appointmentDay")) {
-                            setValue("appointHour", event.start?.getHours());
-
-                          } else {
-                            setValue("appointmentDay", event.start)
-                          }
+                        (event ) => {
+                          setValue("time", event.start.toISOString())
+                          setSelectedEvent(event);
                         }
                       }
-                      toolbar={false}
                       popup
                     />
                   </div>
@@ -357,6 +370,18 @@ const CreateAppointment = ({
                     </span>
                   )
                 }
+              </FormControl>
+
+              <FormControl isInvalid={!!errors.annotations} isRequired>
+                <FormLabel className="text-description/70" mb={1}>
+                  Escreva aqui informações importantes sobre a consulta
+                </FormLabel>
+                <Input
+                  placeholder={"O paciente relatou ter os seguintes sintomas..."}
+                  {...register("annotations", {
+                    required: true
+                  })
+                }/>
               </FormControl>
             </form>
           </ModalBody>
@@ -372,3 +397,5 @@ const CreateAppointment = ({
   );
 };
 export default CreateAppointment;
+
+

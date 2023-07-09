@@ -23,4 +23,8 @@ export interface InputToCreateAppointment extends Omit<
   annotations: string;
 }
 
-export type ICreateAppointment = Omit<IAppointment, "id" | "physician" | "patient">;
+interface AppSpeciality {
+  specialty: Specialty
+}
+
+export type ICreateAppointment = Omit<IAppointment, "id" | "physician" | "patient"> & AppSpeciality;
