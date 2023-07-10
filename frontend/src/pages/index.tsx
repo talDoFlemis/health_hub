@@ -14,6 +14,7 @@ import CreateAppointment from "@/components/appointments/CreateAppointment"
 import {mutate} from "swr";
 
 const Home: NextPageWithLayout = () => {
+  moment.locale('pt-br');
   const { data: appointments, mutate } = useCustomQuery<IAppointment[]>(
     "/api/appointment/all"
   );
@@ -52,8 +53,6 @@ const Home: NextPageWithLayout = () => {
           <CreateAppointment
           isOpen={isOpen}
           onClose={onClose}
-          appointments={appointments ?? []}
-          mutate={mutate}
         />)
       }
       <main className="flex flex-col p-8">

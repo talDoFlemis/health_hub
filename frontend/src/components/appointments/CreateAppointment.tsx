@@ -34,8 +34,6 @@ import {hours} from "date-arithmetic";
 interface ICreateAppointmentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  appointments: IAppointment[];
-  mutate: (args: any) => void;
 }
 
 const messages: Messages = {
@@ -65,9 +63,7 @@ const physicianPickMakeURL = (specialty: string | null, name: string | null) => 
 
 const CreateAppointment = ({
   isOpen,
-  onClose,
-  appointments,
-  mutate
+  onClose
   }: ICreateAppointmentModalProps) => {
   const {
     register,
@@ -77,10 +73,13 @@ const CreateAppointment = ({
     reset,
     formState: { errors, isLoading},
   } = useForm<ICreateAppointment>({ mode: "onBlur" });
+  moment.locale("pt-br");
+
   const { data: session } = useSession();
   const { showSuccessToast, showErrorToast } = useCustomToast();
-  const router = useRouter();
-
+  const { data: appointments, mutate } = useCustomQuery<IAppointment[]>(
+    "/api/appointment/all"
+  );
   const closeAndClear = () => {
         reset();
         onClose();
@@ -96,7 +95,6 @@ const CreateAppointment = ({
 
     const access = session?.user.access_token as string;
     try {
-
       const res = await fetch(`${API_URL}/api/appointment/create`, {
         headers: {
           "Content-Type": "application/json",
@@ -123,9 +121,6 @@ const CreateAppointment = ({
   const hoursWorkedPerDay = 10;
   const lastValidHour = firstValidHour + hoursWorkedPerDay;
 
-  const appointmentMinutesStart = 0
-  const MinutesPerAppointment = 50
-  const appointmentMinutesEnd = appointmentMinutesStart + MinutesPerAppointment
 
   const firstValidDay = moment().startOf("day").add(1, "day");
   const lastValidDay = moment(firstValidDay).add(RangeOfDays, "day");
@@ -143,14 +138,16 @@ const CreateAppointment = ({
                                    new Array(hoursWorkedPerDay).fill(true)
                                  );
 
-  const physicianAppointments = appointments.filter(
+  const physicianAppointments = appointments?.filter(
     (appointment) => (
       physicianId && appointment.physicianId === physicianId
     ));
 
-  physicianAppointments.forEach((appointment) => {
+  for (const appointment of physicianAppointments as IAppointment[]) {
     const appointmentMoment = moment(new Date(appointment.time));
-    const appointmentHour = appointmentMoment.startOf("hour").hour();
+    const appointmentHour = appointmentMoment.hour();
+
+    console.log(appointment);
 
     if (
       (
@@ -166,38 +163,36 @@ const CreateAppointment = ({
 
       if (OpenAppointmentsMatrix[dayIndex][hourIndex]) {
         OpenAppointmentsMatrix[dayIndex][hourIndex] = false;
-        console.log(appointment);
       }
     }
-  })
+  }
 
-  OpenAppointmentsMatrix.forEach(
-    (column, i) => column.forEach(
-      (free, j) => {
+    for (const column of OpenAppointmentsMatrix) {
+      const i = OpenAppointmentsMatrix.indexOf(column);
+      for (let j = 0; j < column.length; j++){
+        const free = column[j];
         if (free) {
-          const startMoment = moment(firstValidDay).add(i, "days").add(j + firstValidHour, "hours");
+          const startMoment = moment(
+            firstValidDay
+          ).add(i, "days").add(j + firstValidHour, "hours");
 
           events.push(
-           {
-            id: j + i*hoursWorkedPerDay,
-            title: "Horario Livre",
-            start: startMoment.toDate(),
-            end: startMoment.add(1, "hours").toDate(),
-          }
-         )
+            {
+              id: j + hoursWorkedPerDay * i,
+              title: free ? "Horario Livre" : "Horario Ocupado",
+              start: startMoment.toDate(),
+              end: startMoment.add(50, "minutes").toDate(),
+            }
+          )
         }
       }
-    )
-  )
-
+    }
   return {
     events: events,
     firstDay: firstValidDay,
     lastDay: lastValidDay
   };
 }
-
-  const [selectedPhysicianId, setSelectedPhysicianId] = useState<number | undefined>(undefined)
 
   const [physicianBySpcltURL, setPhysicianBySpcltURL] = useState(
     physicianPickMakeURL("", "")
@@ -210,19 +205,16 @@ const CreateAppointment = ({
   const [limitDays, setLimitDays] = useState<{
     firstDay: Moment,
     lastDay: Moment
-  } | undefined>(undefined)
+  } | undefined>(undefined);
 
-  const [events, setEvents] = useState<{
+  const [eventsUseState, setEventsUseState] = useState<{
       id: number,
       title: string,
       start: Date,
       end: Date
-    }[] | undefined>(freeAppointmentsEventsCalc(
-      15,
-      selectedPhysicianId
-  ).events);
+    }[] | undefined>(undefined);
 
-  const [selectedEvent, setSelectedEvent] = useState< {
+  const [selectedEventUseState, setSelectedEventUseState] = useState< {
       id: number,
       title: string,
       start: Date,
@@ -251,7 +243,7 @@ const CreateAppointment = ({
                   placeholder="Escolha o paciente que será atendido."
                   {...register("patientId", { required: true})}
                 >
-                  {patients? (
+                  {patients && (
                     patients.map((patient) => {
                       return (
                         <option key={patient.id} value={patient.id}>
@@ -259,12 +251,7 @@ const CreateAppointment = ({
                         </option>
                       )
                     })
-                  ) : (
-                    <span className="py-4 px-2 text-description/70 text-xl">
-                      {"Adicione mais pacientes."}
-                    </span>
                   )}
-
                 </Select>
 
                 {!!errors.patientId && <FormError message="É preciso escolher um paciente" />}
@@ -278,15 +265,14 @@ const CreateAppointment = ({
                 <Select
                   placeholder="Escolha a especialidade do médico"
                   {...register("specialty", { required: true,
-                    onChange: event => {
-                      setEvents(undefined);
+                    onChange: SelectEvent => {
+                      setEventsUseState(undefined);
                       setLimitDays(undefined);
-                      setSelectedEvent(undefined);
-                      setSelectedPhysicianId(undefined);
+                      setSelectedEventUseState(undefined);
 
                       setPhysicianBySpcltURL(
                         physicianPickMakeURL(
-                          event.target.value, ""
+                          SelectEvent.target.value, null
                         )
                       );
                     }
@@ -315,11 +301,11 @@ const CreateAppointment = ({
 
                   <PickPhysician
                     setSelectedPhysicianId={(id: number) => {
-                      setSelectedPhysicianId(id);
                       setValue('physicianId', id);
+
                       const freeApp = freeAppointmentsEventsCalc(
                         15,
-                        Number(selectedPhysicianId)
+                        getValues("physicianId")
                       );
 
                       setLimitDays({
@@ -327,7 +313,7 @@ const CreateAppointment = ({
                         lastDay: freeApp.lastDay
                       })
 
-                      setEvents(
+                      setEventsUseState(
                         freeApp.events
                       );
                     }}
@@ -343,22 +329,24 @@ const CreateAppointment = ({
 
               <FormControl isInvalid={!!errors.time} isRequired>
                 <FormLabel className="text-description/70" mb={1}>
-                  Escolha uma data {selectedEvent?.start.toString()}
+                  Escolha uma data {selectedEventUseState?.start.toString()}
                 </FormLabel>
-                {(events && limitDays && getValues("physicianId")) ? (
+                {(eventsUseState && limitDays && getValues("physicianId")) ? (
                   <div className="h-[70vh]">
                     <Calendar
                       localizer={momentLocalizer(moment)}
-                      events={events}
+                      events={eventsUseState}
                       startAccessor="start"
                       endAccessor="end"
                       messages={messages}
                       defaultView={"week"}
-                      selected={selectedEvent}
+                      selected={selectedEventUseState}
                       onSelectEvent={
-                        (event ) => {
-                          setValue("time", event.start.toISOString())
-                          setSelectedEvent(event);
+                        (eventSelected ) => {
+                          setSelectedEventUseState(eventSelected);
+                          if (selectedEventUseState) {
+                            setValue("time", selectedEventUseState.start.toISOString());
+                          }
                         }
                       }
                       popup
