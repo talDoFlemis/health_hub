@@ -9,22 +9,39 @@ import {useCustomQuery} from "@/hooks/useCustomQuery";
 import {IPatient} from "@/types/patient";
 import {IPhysician} from "@/types/physician";
 import {IAppointment} from "@/types/appointment";
-import {CLIENT_SPECIALITES} from "@/utils/constants";
+import {API_URL, CLIENT_SPECIALITES} from "@/utils/constants";
 import {AiOutlinePlus} from "react-icons/ai";
 import {useRouter} from "next/router";
+import {useSession} from "next-auth/react";
+import useCustomToast from "@/hooks/useCustomToast";
 
-const SearchType = {
-  patient: "PATIENT",
-  physician: "PHYSICIAN",
-  day: "DAY"
-};
+enum SearchType {
+  patient="PATIENT",
+  physician="PHYSICIAN",
+  all="ALL"
+}
 
 interface SearchBy {
-  patientId: number | null,
-  physicianId: number | null,
-  day: Date | null,
-  code: string | null
+  code: SearchType
+  id: number | undefined
+  between: {
+    start: Date,
+    end: Date,
+    confirm: boolean
+  } | undefined
 }
+
+const ArraySearchType = [
+  SearchType.patient,
+  SearchType.physician,
+  SearchType.all
+]
+
+const ClientSearchType: Map<SearchType, string> = new Map([
+  [SearchType.patient, "Filtrar Consultas por Paciente"],
+  [SearchType.physician, "Filrat consultas por Médico"],
+  [SearchType.all, "Todas as Consultas"]
+]);
 
 const FormError = ({ message }: { message: string }) => {
   return (
@@ -81,58 +98,60 @@ const Appointments: NextPageWithLayout = () => {
     handleSubmit,
     formState: { errors }
   } = useForm<SearchBy>();
-  const [dayState, setDayState] = useState<Date | null>(null);
-  const betweenURLCalc = (dateStart: Date, dateEnd: Date) => {
-    const start = moment(dateStart).startOf("day");
-    const end = moment(dateEnd).startOf("day").add(1, "days");
+  const { data: session } = useSession();
+  const { showSuccessToast, showErrorToast } = useCustomToast();
 
-    return (`start=${start.toISOString()}&end=${end.toISOString()}`);
-  };
-
-  const [physicianIdState, setPhysicianIdState] = useState<number | null>(null);
-  const byPhysicianUrl = (physicianId: number | null) => (
-    physicianId ? (
-      `/api/appointment/physician/${physicianId}`
-      ) : null
-  );
-
-  const [patientIdState, setPatientIdState] = useState<number | null>(null);
-  const byPatientUrl = (patientId: number | null) => (
-    patientId ? (
-    `/api/appointment/patient/${patientId}`
-    ) : null
-  );
-
-  const [codeState, setCodeState] = useState<string | null>(SearchType.day);
   const makeUrl = (
-    code: string | null,
+    code: SearchType,
+    id?: number | undefined,
+    between?: {
+      start: Date,
+      end: Date,
+      confirm: boolean
+    } | undefined
   ) => {
+    let url = "/api/appointment/";
+    const defaultUrl = url + "all";
 
-
-    if (code === null) {
-      console.log(patientIdState, physicianIdState, dayState);
+    if (code === SearchType.all) {
+      return defaultUrl;
     }
 
     if (code === SearchType.patient) {
-      return byPatientUrl(patientIdState) ?? DefaultSearch;
+      url = url + "patient/" + ((id && !between) ? id.toString() : "");
+    } else if (code === SearchType.physician) {
+      url = url + "physician/" + ((id && !between) ? id.toString() : "");
     }
 
-    if (code === SearchType.physician) {
-      return byPhysicianUrl(physicianIdState) ?? DefaultSearch;
+    if (between) {
+      const start = moment(between.start).startOf("day");
+      const end = moment(between.end).startOf("day").add(1, "days");
+      const betweenStrChange = `between/${id ? id.toString() : ""}?start=${start.toISOString()}&end=${end.toISOString()}`;
+
+      return (url + betweenStrChange);
     }
 
-    // if (code === SearchType.day) {
-    //   return betweenURLCalc(dayState) ?? DefaultSearch;
-    // }
+    return defaultUrl;
+  }
 
-    return DefaultSearch;
-  };
+  const [urlState, setUrlState] = useState<string>(makeUrl(SearchType.all));
+  const { data: queryResult, mutate, error} =
+    useCustomQuery<IAppointment[]>(urlState);
 
-  const { data: queryResult} = useCustomQuery<IAppointment[]>(
-    "/api/appointment/all"
-  );
-    // useCustomQuery<IAppointment[]>(makeUrl(codeState));
+  const onSubmit = async (search: SearchBy) => {
+    setUrlState(
+      makeUrl(
+        search.code, search.id, search.between
+      )
+    )
 
+    if (error) {
+      showErrorToast("Nao Foi Possível Realizar Sua Pesquisa", error.message);
+    } else {
+      showSuccessToast("Pesquisa Realizada Com Sucesso");
+    }
+    reset();
+  }
 
   const fixedQueryPhysicians = useCustomQuery<IPhysician[]>(
     "/api/physician"
@@ -154,79 +173,73 @@ const Appointments: NextPageWithLayout = () => {
       <div className="flex flex-col p-8">
         <div className="flex w-full flex-col rounded-lg bg-white px-4 py-4 shadow-lg">
           <form
-            onSubmit={handleSubmit(
-              (event) => {
-                console.log();
-                setCodeState(
-                  event.day ? (SearchType.day) : (
-                    event.patientId ? (SearchType.physician) : (
-                      event.physicianId ? (SearchType.patient) : null
-                    )
-                  )
-                );
-              }
-            )}
+            onSubmit={handleSubmit(onSubmit)}
             id="form"
             className="flex flex-col gap-4"
           >
             <FormControl>
               <FormLabel className="text-description/70" mb={1}>
-                Filtre por Paciente:
+                Escolha o Formato da Pesquisa
               </FormLabel>
-              <Select placeholder={"Escolha um Paciente"}
-                {...register("patientId",
-                  {
-                    required: false,
-                    onChange: (event) => {
-                      setValue("patientId", event.target.value.length > 0 ? (
-                          event.target.value
-                        ) : null
-                      );
-                      setValue("physicianId", null);
-                      setInvalidPatient(false);
-                    }
-                  })
-                }
+              <Select placeholder={"Escolha o formato da pesquisa"}
+                {...register("code", {required: true})}
+                onChange={() => {
+                  reset();
+                }}
               >
-                {fixedQueryPatients && fixedQueryPatients.map((patient) => {
+                {ArraySearchType.map((type, index) => {
                   return (
-                    <option key={patient.id} value={patient.id}>
-                      {patient.firstname + patient.lastname}
+                    <option key={index} value={type}>
+                      {ClientSearchType.get(type) ?? type}
                     </option>
                   );
                 })}
               </Select>
               {invalidPatient && (
-                <FormError message="Escolha apenas um filtro"/>
+                <FormError message="É preciso escolher o formato da pesquisa"/>
               )}
             </FormControl>
 
-            <FormControl>
-              <FormLabel className="text-description/70" mb={1}>
-                Filtre por Médico:
-              </FormLabel>
-              <Select placeholder={"Escolha um Médico"}
-                {...register("physicianId",
-                  {
-                    required: false,
-                    onChange: (event) => {
-                      setValue("physicianId", event.target.value.length > 0 ? (
-                          event.target.value
-                        ) : null
-                      );
-                      setValue("patientId", null);
-                      setInvalidPatient(false);
-                    }
-                  })
-                }
+            <FormControl
+              isDisabled={(
+                getValues("code") !== SearchType.patient && getValues("code") !== SearchType.physician
+              )}
               >
-                {fixedQueryPhysicians && fixedQueryPhysicians.map((physician) => {
-                  return (
-                    <option key={physician.id} value={physician.id}>
-                      {physician.name}
-                    </option>
-                  );
-                })}
+                <FormLabel className="text-description/70" mb={1}>
+                  Filtre por {ClientSearchType.get(getValues("code"))}
+                </FormLabel>
+                <Select
+                  placeholder={
+                  (getValues("code") === SearchType.patient) ? (
+                    "Escolha um Paciente"
+                    ) : (
+                      getValues("code") === SearchType.physician ? (
+                        "Escolha um Médico"
+                      ) : (
+                        "------------------"
+                      )
+                    )
+                  }
+                  {...register("id")}
+                >
+                  {(getValues("code") !== SearchType.physician ? (
+                      fixedQueryPatients
+                    ) : (
+                      fixedQueryPhysicians
+                    ))?.map((data) => {
+                      const numId: number = data.id;
+                      const name: string = getValues("code") === SearchType.physician ? (
+                        (data as IPhysician).name
+                      ) : (
+                        (data as IPatient).firstname + " " + (data as IPatient).lastname
+                      );
+                      return (
+                        <option key={data.id} value={numId}>
+                          {name}
+                        </option>
+                      );
+                  })
+                  }
               </Select>
               {invalidPhysician && (
                 <FormError message="Escolha apenas um filtro"/>
@@ -234,16 +247,33 @@ const Appointments: NextPageWithLayout = () => {
             </FormControl>
 
 
-            <FormControl>
-              <FormLabel className="text-description/70" mb={1}>
-                Escolha o dia:
-              </FormLabel>
-              <Input
-                 placeholder="Select Date and Time"
+            <FormControl
+              isDisabled={(getValues("code") === SearchType.all)}
+              className={"flex flex-column gap-2 justify-around"}
+            >
+
+              <FormLabel className="text-description/40" mb={1}>
+                Inicio
+                <Input
+                 placeholder="Selecione a data de inicio do intervalo"
                  size="md"
                  type="datetime-local"
-                 {...register("day", {required: true})
-              }/>
+                 {...register("between.start", {required: (getValues("code") !== SearchType.all)})
+                }/>
+              </FormLabel>
+
+              <FormLabel className="text-description/40" mb={1}>
+                Final
+                <Input
+                  isDisabled={!(
+                    getValues("between") && getValues("between.start")
+                  )}
+                  placeholder="Selecione a data do final do intervalo"
+                  size="md"
+                  type="datetime-local"
+                  {...register("between.end", {required: (getValues("code") !== SearchType.all)})
+                }/>
+              </FormLabel>
             </FormControl>
 
             <Button colorScheme="green" mr={3} type="submit" form="form">
@@ -252,7 +282,6 @@ const Appointments: NextPageWithLayout = () => {
           </form>
         </div>
       </div>
-
 
 
 
