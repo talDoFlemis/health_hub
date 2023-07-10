@@ -1,7 +1,7 @@
 import { IPatient } from "./patient";
 import { IPhysician } from "./physician";
 import { Specialty } from "./physician";
-import {Simulate} from "react-dom/test-utils";
+import { Simulate } from "react-dom/test-utils";
 import input = Simulate.input;
 
 export interface IAppointment {
@@ -14,9 +14,8 @@ export interface IAppointment {
   physicianId: number;
 }
 
-export interface InputToCreateAppointment extends Omit<
-  IAppointment, "id" | "physician" | "patient" | "time"
-> {
+export interface InputToCreateAppointment
+  extends Omit<IAppointment, "id" | "physician" | "patient" | "time"> {
   specialty: Specialty;
   appointmentDay: Date;
   appointHour: number;
@@ -24,7 +23,11 @@ export interface InputToCreateAppointment extends Omit<
 }
 
 interface AppSpeciality {
-  specialty: Specialty
+  specialty: Specialty;
 }
 
-export type ICreateAppointment = Omit<IAppointment, "id" | "physician" | "patient"> & AppSpeciality;
+export type ICreateAppointment = Omit<
+  IAppointment,
+  "id" | "physician" | "patient"
+> &
+  AppSpeciality;
