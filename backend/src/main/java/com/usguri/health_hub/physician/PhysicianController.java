@@ -16,8 +16,9 @@ public class PhysicianController {
 
   @GetMapping
   @PreAuthorize(value = "hasAnyRole('ADMIN', 'ATTENDANT')")
-  public List<Physician> getPhysicians(@RequestParam Optional<Specialty> specialty) {
-    return physicianService.getPhysicians(specialty);
+  public List<Physician> getPhysicians(
+      @RequestParam Optional<Specialty> specialty, @RequestParam Optional<String> name) {
+    return physicianService.getPhysicians(specialty, name);
   }
 
   @PostMapping

@@ -3,8 +3,8 @@ import { useRouter } from "next/router";
 import { Inter } from "next/font/google";
 import { FiMenu } from "react-icons/fi";
 import { BiPlusMedical } from "react-icons/bi";
-import { FaHome, FaUserFriends } from "react-icons/fa";
-import { FaUserDoctor } from "react-icons/fa6";
+import { FaHome } from "react-icons/fa";
+import { FaUserDoctor, FaUserInjured, FaUserTie } from "react-icons/fa6";
 import { BsFillCalendarDayFill } from "react-icons/bs";
 import { RiLogoutBoxRLine } from "react-icons/ri";
 import { type IconType } from "react-icons";
@@ -55,7 +55,7 @@ const sidebarItems: SidebarItemProps[] = [
   },
   {
     name: "Pacientes",
-    Icon: FaUserFriends,
+    Icon: FaUserInjured,
     path: "/patients",
     roles: [Roles.Admin, Roles.Attendant],
   },
@@ -64,6 +64,12 @@ const sidebarItems: SidebarItemProps[] = [
     Icon: FaUserDoctor,
     path: "/doctors",
     roles: [Roles.Admin, Roles.Attendant],
+  },
+  {
+    name: "Atendentes",
+    Icon: FaUserTie,
+    path: "/attendants",
+    roles: [Roles.Admin],
   },
 ];
 
