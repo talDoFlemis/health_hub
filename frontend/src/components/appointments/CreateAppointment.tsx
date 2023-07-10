@@ -1,8 +1,7 @@
 import useCustomToast from "@/hooks/useCustomToast";
-import {ICreatePatient, IPatient} from "@/types/patient";
+import {IPatient} from "@/types/patient";
 import { API_URL } from "@/utils/constants";
 import {
-  background,
   Button,
   FormControl,
   FormLabel,
@@ -17,23 +16,22 @@ import {
 } from "@chakra-ui/react";
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
-import { IAppointment, ICreateAppointment, InputToCreateAppointment } from "@/types/appointment";
+import { IAppointment, ICreateAppointment } from "@/types/appointment";
 import { SPECIALTIES, CLIENT_SPECIALITES } from "@/utils/constants";
 import moment, {Moment} from "moment/moment";
 import React, { useState } from "react";
-import { IPhysician, Specialty } from "@/types/physician";
+import { IPhysician } from "@/types/physician";
 import PickPhysician from "@/components/doctors/PickPhysician";
-import { Simulate } from "react-dom/test-utils";
 import { useCustomQuery } from "@/hooks/useCustomQuery";
-import {mockSession} from "next-auth/client/__tests__/helpers/mocks";
 import {Calendar, Messages, momentLocalizer} from "react-big-calendar";
+import { router } from "next/client";
 import {useRouter} from "next/router";
-import {pairs} from "yaml/dist/schema/yaml-1.1/pairs";
-import {hours} from "date-arithmetic";
 
 interface ICreateAppointmentModalProps {
   isOpen: boolean;
   onClose: () => void;
+  appointments: IAppointment[];
+  mutate: (args: any) => void;
 }
 
 const messages: Messages = {
@@ -63,8 +61,12 @@ const physicianPickMakeURL = (specialty: string | null, name: string | null) => 
 
 const CreateAppointment = ({
   isOpen,
-  onClose
+  onClose,
+  appointments,
+  mutate
   }: ICreateAppointmentModalProps) => {
+  const router = useRouter();
+  moment.locale("pt-br");
   const {
     register,
     handleSubmit,
@@ -73,21 +75,22 @@ const CreateAppointment = ({
     reset,
     formState: { errors, isLoading},
   } = useForm<ICreateAppointment>({ mode: "onBlur" });
-  moment.locale("pt-br");
 
   const { data: session } = useSession();
   const { showSuccessToast, showErrorToast } = useCustomToast();
-  const { data: appointments, mutate } = useCustomQuery<IAppointment[]>(
-    "/api/appointment/all"
-  );
   const closeAndClear = () => {
         reset();
         onClose();
   };
 
   const onSubmit = async (data: ICreateAppointment) => {
-    const formatedData = {
-      annotations: data.annotations ?? "",
+    const formattedData: {
+      annotations: string,
+      patient_id: number,
+      physician_id: number,
+      time: string
+    } = {
+      annotations: data.annotations ?? "NO-NOTES",
       patient_id: data.patientId,
       physician_id: data.physicianId,
       time: data.time
@@ -101,13 +104,12 @@ const CreateAppointment = ({
           Authorization: `Bearer ${access}`,
         },
         method: "POST",
-        body: JSON.stringify(formatedData),
+        body: JSON.stringify(formattedData),
       });
-      const newApp = await res.json();
-      showSuccessToast("Médico criado com sucesso");
-      mutate([...appointments, newApp]);
-      reset();
-      onClose();
+      showSuccessToast("Consulta criada com sucesso");
+      console.log(res);
+      closeAndClear();
+      await router.push(`/`);
     } catch (error: any) {
       showErrorToast("Não foi possível marcar sua consulta", error.message);
     }
@@ -181,7 +183,7 @@ const CreateAppointment = ({
               id: j + hoursWorkedPerDay * i,
               title: free ? "Horario Livre" : "Horario Ocupado",
               start: startMoment.toDate(),
-              end: startMoment.add(50, "minutes").toDate(),
+              end: startMoment.add(1, "hour").toDate(),
             }
           )
         }
@@ -247,7 +249,7 @@ const CreateAppointment = ({
                     patients.map((patient) => {
                       return (
                         <option key={patient.id} value={patient.id}>
-                          {patient.firstname + " " +  patient.lastname}
+                          {patient?.firstname + " " +  patient?.lastname}
                         </option>
                       )
                     })
@@ -343,10 +345,7 @@ const CreateAppointment = ({
                       selected={selectedEventUseState}
                       onSelectEvent={
                         (eventSelected ) => {
-                          setSelectedEventUseState(eventSelected);
-                          if (selectedEventUseState) {
-                            setValue("time", selectedEventUseState.start.toISOString());
-                          }
+                          setValue("time", moment(eventSelected.start).subtract(3, "hours").toISOString());
                         }
                       }
                       popup

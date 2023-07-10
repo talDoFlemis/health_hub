@@ -1,11 +1,8 @@
-import React, {useState} from "react";
-import {IPhysician, Specialty} from "@/types/physician";
-import {useCustomQuery} from "@/hooks/useCustomQuery";
-import {Avatar, Button, Select} from "@chakra-ui/react";
-import {SPECIALTIES, CLIENT_SPECIALITES} from "@/utils/constants";
-import {AiOutlineClose} from "react-icons/ai";
-import {BsSearch} from "react-icons/bs";
-import {BiPencil} from "react-icons/bi";
+import React from "react";
+import {IPhysician} from "@/types/physician";
+import {Avatar} from "@chakra-ui/react";
+import {CLIENT_SPECIALITES} from "@/utils/constants";
+
 interface PickDoctorCardProps {
   physician: IPhysician;
   setSelectedPhysicianId: (id: number) => void;
@@ -15,7 +12,10 @@ const PickDoctorCard = ({ physician, setSelectedPhysicianId,  }: PickDoctorCardP
   return (
     <>
       <button
-        className = "flex w-full items-center gap-4 rounded-lg border border-description/30 px-4 py-2"
+        className = {`flex w-full items-center gap-4 rounded-lg 
+        border border-description/30 px-4 py-2
+        hover
+        `}
         onClick={(event) => {
           event.preventDefault();
           setSelectedPhysicianId(physician.id);
