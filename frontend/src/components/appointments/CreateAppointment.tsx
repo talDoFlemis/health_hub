@@ -67,7 +67,6 @@ const CreateAppointment = ({
   mutate,
 }: ICreateAppointmentModalProps) => {
   const router = useRouter();
-  moment.locale("pt-br");
   const {
     register,
     handleSubmit,
@@ -108,7 +107,6 @@ const CreateAppointment = ({
         body: JSON.stringify(formattedData),
       });
       showSuccessToast("Consulta criada com sucesso");
-      console.log(res);
       closeAndClear();
       await router.push(`/`);
     } catch (error: any) {
@@ -145,8 +143,6 @@ const CreateAppointment = ({
     for (const appointment of physicianAppointments as IAppointment[]) {
       const appointmentMoment = moment(new Date(appointment.time));
       const appointmentHour = appointmentMoment.hour();
-
-      console.log(appointment);
 
       if (
         appointmentMoment.isAfter(firstValidDay) &&
@@ -317,6 +313,7 @@ const CreateAppointment = ({
 
                     setEventsUseState(freeApp.events);
                   }}
+                  currentPhysician={getValues("physicianId")}
                   physicians={getValues("specialty") ? (doctors as []) : []}
                   notFoundMsg={
                     !getValues("specialty")
@@ -356,7 +353,7 @@ const CreateAppointment = ({
                     />
                   </div>
                 ) : (
-                  <span className="py-4 px-2 text-description/70 text-xl">
+                  <span className="px-2 py-4 text-xl text-description/70">
                     {"Escolha um médico antes"}
                   </span>
                 )}
