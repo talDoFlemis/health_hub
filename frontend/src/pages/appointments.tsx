@@ -8,7 +8,7 @@ import {
   Avatar,
   Button,
   Card,
-  Checkbox,
+  Checkbox, filter,
   FormControl,
   FormLabel,
   Input,
@@ -33,7 +33,10 @@ import * as typeHandler from "zod";
 enum SearchType {
   patient="PATIENT",
   physician="PHYSICIAN",
-  all="ALL"
+  all="ALL",
+  patientBetween="PATIENT_BETWEEN",
+  physicianBetween="PHYSICIAN_BETWEEN",
+  allBetween="ALL_BETWEEN"
 }
 
 interface SearchBy {
@@ -48,25 +51,28 @@ interface SearchBy {
 const ClientSearchType: Map<SearchType, string> = new Map([
   [SearchType.patient, "Filtrar Consultas por Paciente"],
   [SearchType.physician, "Filrat consultas por Médico"],
-  [SearchType.all, "Todas as Consultas"]
-]);
-
-const ServerSearchType: Map<SearchType, string> = new Map([
-  [SearchType.patient, "/api/appointment/patient/"],
-  [SearchType.physician, "//api/appointment/physician/"],
-  [SearchType.all, "/api/appointment/"]
+  [SearchType.all, "Todas as Consultas"],
+  [SearchType.patientBetween, "Filtrar Consultas por Paciente & Entre Datas"],
+  [SearchType.physicianBetween, "Filrat consultas por Médico & Entre Datas"],
+  [SearchType.allBetween, "Todas as Consultas Entre Datas"],
 ]);
 
 const ArraySearchType = [
   SearchType.patient,
   SearchType.physician,
-  SearchType.all
+  SearchType.all,
+  SearchType.physicianBetween,
+  SearchType.patientBetween,
+  SearchType.allBetween
 ];
 
 const ClientSelectId = new Map([
   [SearchType.physician, "Selecione um Médico"],
   [SearchType.patient, "Selecione um Paciente"],
-  [SearchType.all, "---------------"]
+  [SearchType.all, "---------------"],
+  [SearchType.physicianBetween, "Selecione um Médico"],
+  [SearchType.patientBetween, "Selecione um Paciente"],
+  [SearchType.allBetween, "---------------"]
 ])
 
 const DefaultBackwardStartDate = 15;
@@ -76,33 +82,21 @@ interface SearchForm {
     type: SearchType,
     targetId: number | null
   },
-  betweenOn: boolean,
   between: {
     start: Date,
     end: Date
-  } | null
+  }
 }
 
 const searchFormSchema = typeHandler.object({
   searchTarget: typeHandler.object({
     type: typeHandler.nativeEnum(SearchType),
     targetId: typeHandler.number().nullable()
-  }).refine(
-    (data) => data.targetId && data.type === SearchType.all, {
-      path: ["targetId"],
-      message: `O filtro "${ClientSearchType.get(SearchType.all)}" não pode ter um alvo definido`
-    }
-  ),
-  betweenOn: typeHandler.boolean().default(false),
+  }),
   between: typeHandler.object({
     start: typeHandler.date(),
     end: typeHandler.date()
-  }).nullable().refine(
-    (data) => data && (data.end && !data.start), {
-      path: ["end"],
-      message: "É preciso definir o limite inferior de busca"
-    }
-  ).default(null)
+  })
 });
 
 type SearchFormSchema = typeHandler.infer<typeof searchFormSchema>
@@ -163,7 +157,6 @@ const Appointments: NextPageWithLayout = () => {
   } = useForm<SearchFormSchema>();
   const { data: session } = useSession();
   const { showSuccessToast, showErrorToast } = useCustomToast();
-  const [ appointmentsQuery, setAppointments ]  = useState<IAppointment[]>([] as IAppointment[]);
   const DefaultDateSearch = {
     start: moment().startOf("day").subtract(
       DefaultBackwardStartDate, "days"
@@ -171,100 +164,102 @@ const Appointments: NextPageWithLayout = () => {
     end: moment().toDate()
   }
 
-  const searchAppointments = async (
-      {
-        searchTarget,
-        betweenOn,
-        between
-      } : SearchForm ) => {
-    const fetchBody = () => {
-      if (betweenOn && between) {
-        const startISO = moment(between.start)
-          .startOf("day").toDate()
-          .toISOString();
-        const endISO = moment(between.end)
-          .startOf("day").add(1, "days").toDate()
-          .toISOString();
-        const queryBody = {
-          start: startISO,
-          end: endISO
-        };
-
-        return({
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.user.access_token as string}`,
-          },
-          body: JSON.stringify(queryBody)
-        })
-      }
-
-      return({
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.user.access_token as string}`,
-        },
-      })
-    }
-    const baseUrl = ServerSearchType.get(searchTarget.type);
-    const addBetween = searchTarget.type === SearchType.all ? (
-        betweenOn ? (
-          "between"
+  const dateISOStringParams = (start?: Date, end?: Date) => "?" +
+    `start=${
+        start ? (
+          start.toISOString()
         ) : (
-          "all"
+          DefaultDateSearch.start.toISOString()
         )
-      ) : (
-        betweenOn ? (
-          "between/"
+      }&end=${
+        end ? (
+          end.toISOString()
         ) : (
-          ""
+          DefaultDateSearch.start.toISOString()
         )
-    );
-    const addId = (
-      searchTarget.type === SearchType.patient ||
-      searchTarget.type === SearchType.physician) &&
-      searchTarget.targetId? (
-        searchTarget.targetId.toString()
-      ) : "";
+      }`;
 
-    const url = baseUrl + addBetween + addId;
-    const path = `${process.env.NEXT_PUBLIC_API_URL}${url}`;
+  const ServerSearchUrl: Map<SearchType, (start?: Date, end?: Date) => string> = new Map([
+    [SearchType.patient, () =>
+      `/api/appointment/patient/${(getValues("searchTarget.targetId")?? "").toString()}`
+    ],
+    [SearchType.physician, () =>
+      `/api/appointment/physician/${(getValues("searchTarget.targetId")?? "").toString()}`
+    ],
+    [SearchType.all, () =>
+      `/api/appointment/all`
+    ],
+    [SearchType.allBetween, (start?: Date, end?: Date) =>
+      `/api/appointment/between${
+        dateISOStringParams(start, end)
+      }`
+    ],
+    [SearchType.patientBetween, (start?: Date, end?: Date) =>
+      `/api/appointment/patient/between/${
+        (getValues("searchTarget.targetId")?? "").toString()
+      }${
+       dateISOStringParams(start, end) 
+      }`
+    ],
+    [SearchType.physicianBetween, (start?: Date, end?: Date) =>
+      `/api/appointment/physician/between/${
+        (getValues("searchTarget.targetId")?? "").toString()
+      }${
+       dateISOStringParams(start, end) 
+      }`
+    ]
 
-    console.log(fetchBody());
-    console.log(path);
-    const response = await fetch(
-      path, fetchBody()
-    )
+  ]);
 
-    reset();
-    const responseJson = await response.json();
-    if (response.ok) {
-      showSuccessToast(responseJson.data.length > 0 ? (
-        "Sua pesquisa foi realizada"
-      ):(
-        "Nenhuma consulta se enquadra nos filtros desejados"
-      ));
+  const makeURL = (type: SearchType, start?: Date, end?: Date) => {
+    const getUrlFn = ServerSearchUrl.get(type);
 
-      setAppointments(
-        responseJson.data
-      );
-    } else {
-      console.log(response);
-      const error = new Error("An error occurred while fetching the data.");
-
-      setAppointments(
-        [] as IAppointment[]
-      );
+    if (getUrlFn) {
+      return getUrlFn(start, end);
     }
+
+    return "/api/appointment/all"
   }
 
+  const [SearchURL, setSearchURL] = useState<string>(
+    makeURL(SearchType.all)
+  );
+
+  const {
+    data: appointmentsQuery, mutate
+  } = useCustomQuery<IAppointment[]>(
+    SearchURL
+  );
+
+  const filterMutate = (newData: IAppointment[]) => appointmentsQuery?.filter(
+    (appointment) => !newData.includes(appointment)
+  );
+
   const onSubmit = async (data: SearchFormSchema) => {
+    const access = session?.user.access_token as string;
+
+    const type = data.searchTarget.type;
+    const start = data.between.start ?? undefined;
+    const end = data.between.end ?? undefined
+    setSearchURL(
+        makeURL(
+          type, start, end
+        )
+      );
     try {
-      await searchAppointments(data)
-    } catch (err) {
-      console.log(err);
+      const res = await fetch(`${API_URL}${SearchURL}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${access}`,
+        },
+        method: "GET",
+      });
+      const appointNewQuery = await res.json();
+      mutate([...(filterMutate(appointNewQuery)?? [] as IAppointment[])], appointNewQuery);
+      showSuccessToast("Sua pesquisa foi realizada");
+      reset();
+    } catch (error: any) {
+      showErrorToast("Erro na pesquisa", error.message);
     }
   }
 
@@ -276,16 +271,6 @@ const Appointments: NextPageWithLayout = () => {
     "/api/patient/all"
   ).data;
 
-  const searchBetweenCheckBoxChange = () => {
-    const between = getValues("between");
-
-    if (between) {
-      setValue("between", null);
-    } else {
-      setValue("between", DefaultDateSearch);
-    }
-  }
-
   const [unionSelectArray, setUnionSelectArray] =
     useState<IPatient[] | IPhysician[]>([] as IPhysician[]);
 
@@ -296,13 +281,18 @@ const Appointments: NextPageWithLayout = () => {
         type: targetType,
         targetId: null
       },
-      between: null
+      between: DefaultDateSearch
     });
 
-    if (targetType && targetType === SearchType.patient) {
+    if (targetType && (
+        targetType === SearchType.patient || targetType == SearchType.patientBetween
+      )
+    ) {
       setUnionSelectArray(fixedQueryPatients ?? [] as IPatient[]);
-    } else if (targetType && targetType === SearchType.physician) {
-      // Adicionar match de tipo para evitar reescrita desnecessaria
+    } else if (targetType && (
+        targetType === SearchType.physician || targetType == SearchType.physicianBetween
+      )
+    ) {
       setUnionSelectArray(fixedQueryPhysicians ?? [] as IPhysician[]);
     }
   }
@@ -349,9 +339,7 @@ const Appointments: NextPageWithLayout = () => {
                 >
                   {unionSelectArray.map((data) => {
                       const numId: number = data.id;
-                      const name: string = getValues("searchTarget.type") === SearchType.physician ? (
-                        (data as IPhysician).name
-                      ) : (
+                      const name: string = (data as IPhysician).name?? (
                         (data as IPatient).firstname + " " + (data as IPatient).lastname
                       );
 
@@ -367,38 +355,32 @@ const Appointments: NextPageWithLayout = () => {
 
             <FormControl className={"flex flex-column gap-2 justify-around"}
             isInvalid={!!errors.between} >
-              <Checkbox
-                  size="md"
-                  type="checkbox"
-                  {...register("betweenOn", {required: false})}
-                >
               <FormLabel className="text-description/70" mb={1}>
-                Pesquisar em um intervalo {
-                getValues("between.start")?.toString() +
-                getValues("between.end")?.toString()
-              }
+                Pesquisar em um intervalo
               </FormLabel>
 
               <FormLabel className="text-description/70" mb={1}>
-                Inicio
+                Inicio: {moment(getValues("between.start")).fromNow()}
                 <Input
+                  defaultValue={DefaultDateSearch.start.toISOString().split("T")[0]}
                  placeholder="Selecione a data de inicio do intervalo"
                  size="md"
-                 type="datetime-local"
+                 type="date"
                  {...register("between.start", { required: false })
                 }/>
+
               </FormLabel>
 
               <FormLabel className="text-description/70" mb={1}>
-                Final
+                Final: {moment(getValues("between.end")).fromNow()}
                 <Input
+                  defaultValue={DefaultDateSearch.end.toISOString().split("T")[0]}
                   placeholder="Selecione a data do final do intervalo"
                   size="md"
-                  type="datetime-local"
+                  type="date"
                   {...register("between.end", { required: false })
                 }/>
               </FormLabel>
-              </Checkbox>
               {!!errors && !!errors.between && (
                 <FormError message={errors.between.message ?? "ERROR IN INPUT DATE"}></FormError>
               )}
