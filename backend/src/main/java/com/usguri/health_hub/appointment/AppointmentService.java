@@ -6,6 +6,7 @@ import com.usguri.health_hub.physician.Physician;
 import com.usguri.health_hub.physician.PhysicianRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -51,12 +52,11 @@ public class AppointmentService {
   /**
    * Obtém a lista de todas as consultas médicas dentro de um determinado período.
    *
-   * @param dto O objeto que contém as datas de início e fim do período.
+   * @param start O objeto que contém as datas de início e fim do período.
    * @return A lista de todas as consultas médicas dentro do período especificado.
    */
-  public List<Appointment> getAllBetween(BetweenDatesDTO dto) {
-    return this.appointmentRepository.findAllByTimeBetweenOrderByTimeAsc(
-        dto.getStart(), dto.getEnd());
+  public List<Appointment> getAllBetween(LocalDateTime start, LocalDateTime end) {
+    return this.appointmentRepository.findAllByTimeBetweenOrderByTimeAsc(start, end);
   }
 
   /**
@@ -149,25 +149,26 @@ public class AppointmentService {
    * Obtém a lista de todas as consultas médicas de um paciente específico dentro de um determinado
    * período.
    *
-   * @param dates O objeto que contém as datas de início e fim do período.
+   * @param start O objeto que contém as datas de início e fim do período.
    * @param id O ID do paciente.
    * @return A lista de todas as consultas médicas do paciente dentro do período especificado.
    */
-  public List<Appointment> getAllByPatientBetween(BetweenDatesDTO dates, Long id) {
+  public List<Appointment> getAllByPatientBetween(LocalDateTime start, LocalDateTime end, Long id) {
     return this.appointmentRepository.findAllByPatientIdAndTimeBetweenOrderByTimeAsc(
-        id, dates.getStart(), dates.getEnd());
+        id, start, end);
   }
 
   /**
    * Obtém a lista de todas as consultas médicas de um médico específico dentro de um determinado
    * período.
    *
-   * @param dates O objeto que contém as datas de início e fim do período.
+   * @param start O objeto que contém as datas de início e fim do período.
    * @param id O ID do médico.
    * @return A lista de todas as consultas médicas do médico dentro do período especificado.
    */
-  public List<Appointment> getAllByPhysicianBetween(BetweenDatesDTO dates, Long id) {
+  public List<Appointment> getAllByPhysicianBetween(
+      LocalDateTime start, LocalDateTime end, Long id) {
     return this.appointmentRepository.findAllByPhysicianIdAndTimeBetweenOrderByTimeAsc(
-        id, dates.getStart(), dates.getEnd());
+        id, start, end);
   }
 }
