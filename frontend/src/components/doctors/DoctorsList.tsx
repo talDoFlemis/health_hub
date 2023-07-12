@@ -60,7 +60,7 @@ const DoctorCard = ({ role, doctor, doctors, mutate }: DoctorCardProps) => {
               <AiOutlineClose className="text-sm text-description/70 hover:text-accent" />
             </button>
           </>
-        )} 
+        )}
       </div>
     </>
   );
@@ -73,7 +73,7 @@ interface DoctorsListProps {
 
 const DoctorsList = ({ doctors, mutate }: DoctorsListProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  
+
   const role = useSession().data?.user.role as Roles;
 
   return (
