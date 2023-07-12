@@ -20,11 +20,17 @@ const MyAppointments: NextPageWithLayout = () => {
       <Head>
         <title>Health Hub • Minhas Consultas</title>
       </Head>
-      <main className={`flex flex-col py-8 px-2 md:px-4 lg:px-8 ${inter.className}`}>
-        <h1 className="text-primary text-5xl font-bold mb-4">Minhas Consultas</h1>
+      <main
+        className={`flex flex-col py-8 px-2 md:px-4 lg:px-8 ${inter.className}`}
+      >
+        <h1 className="text-primary text-5xl font-bold mb-4">
+          Minhas Consultas
+        </h1>
         {appointments ? (
-          <AppointmentList appointments={appointments}/>
-        ) : <Skeleton height="140px" />} 
+          <AppointmentList appointments={appointments} />
+        ) : (
+          <Skeleton height="140px" />
+        )}
       </main>
     </>
   );

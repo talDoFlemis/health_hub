@@ -113,8 +113,8 @@ interface AppointmentCardProps {
 }
 
 const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
-  const patientName = appointment.patient.firstname + " " +
-    appointment.patient.lastname;
+  const patientName =
+    appointment.patient.firstname + " " + appointment.patient.lastname;
 
   return (
     <div
@@ -129,10 +129,7 @@ const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
           Consulta #{appointment.id}
         </h3>
         <div className="flex gap-1">
-          <FaRegCalendarAlt
-            className="text-accent"
-            size="1.25rem"
-          />
+          <FaRegCalendarAlt className="text-accent" size="1.25rem" />
           <span className="text-description/70">
             {moment(appointment.time).format("dddd, DD MMMM YYYY, HH:mm")}
           </span>
@@ -173,14 +170,16 @@ interface AppointmentListProps {
 const AppointmentList = ({ appointments }: AppointmentListProps) => {
   return (
     <div className="grid w-full gap-2 rounded-lg bg-white px-4 py-4 shadow-lg xl:grid-cols-2">
-      {appointments.length > 0 ? (appointments.map((appointment) => {
-        return (
-          <AppointmentCard
-            key={`appointment ${appointment.id}`}
-            appointment={appointment}
-          />
-        );
-      })) : (
+      {appointments.length > 0 ? (
+        appointments.map((appointment) => {
+          return (
+            <AppointmentCard
+              key={`appointment ${appointment.id}`}
+              appointment={appointment}
+            />
+          );
+        })
+      ) : (
         <span className="py-4 px-2 text-description/70 text-xl">
           Nenhuma consulta encontrada...
         </span>
