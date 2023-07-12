@@ -1,6 +1,8 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+// Esse objeto tem envelopa as principais funções para lidar com o sistema de
+// autentificação na aplicação.
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
@@ -42,6 +44,7 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  // Adiciona os tokens jwt ao estado da aplicação.
   callbacks: {
     async jwt({ token, user }) {
       if (user) {

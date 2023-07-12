@@ -49,7 +49,7 @@ const Patients: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Pacientes - Health Hub</title>
+        <title>Health Hub • Pacientes</title>
       </Head>
       <AddPatientModal
         isOpen={isOpen}
