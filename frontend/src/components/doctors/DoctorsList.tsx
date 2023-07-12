@@ -8,14 +8,17 @@ import DeleteDoctorAlert from "./DeleteDoctorAlert";
 import { AiOutlineClose } from "react-icons/ai";
 import { BiPencil } from "react-icons/bi";
 import { IPhysician } from "@/types/physician";
+import { Roles } from "@/utils/constants";
+import { useSession } from "next-auth/react";
 
 interface DoctorCardProps {
+  role: Roles;
   doctor: IPhysician;
   doctors: IPhysician[];
   mutate: (args: any) => void;
 }
 
-const DoctorCard = ({ doctor, doctors, mutate }: DoctorCardProps) => {
+const DoctorCard = ({ role, doctor, doctors, mutate }: DoctorCardProps) => {
   const {
     isOpen: isEditOpen,
     onOpen: onEditOpen,
@@ -48,12 +51,16 @@ const DoctorCard = ({ doctor, doctors, mutate }: DoctorCardProps) => {
           <h3 className="text-xl font-bold text-primary">{doctor.name}</h3>
           <h4 className="text-md text-description/70">{doctor.specialty}</h4>
         </div>
-        <button className="ml-auto self-start" onClick={onEditOpen}>
-          <BiPencil className="text-description/70 hover:text-primary" />
-        </button>
-        <button className="self-start" onClick={onDeleteOpen}>
-          <AiOutlineClose className="text-sm text-description/70 hover:text-accent" />
-        </button>
+        {role === Roles.Admin && (
+          <>
+            <button className="ml-auto self-start" onClick={onEditOpen}>
+              <BiPencil className="text-description/70 hover:text-primary" />
+            </button>
+            <button className="self-start" onClick={onDeleteOpen}>
+              <AiOutlineClose className="text-sm text-description/70 hover:text-accent" />
+            </button>
+          </>
+        )}
       </div>
     </>
   );
@@ -67,6 +74,8 @@ interface DoctorsListProps {
 const DoctorsList = ({ doctors, mutate }: DoctorsListProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const role = useSession().data?.user.role as Roles;
+
   return (
     <div className="grid w-full gap-2 rounded-lg bg-white px-4 py-4 shadow-lg lg:grid-cols-2">
       <CreateDoctorModal
@@ -77,19 +86,22 @@ const DoctorsList = ({ doctors, mutate }: DoctorsListProps) => {
       />
       <div className="flex items-center lg:col-span-full">
         <h1 className="mb-4 text-5xl font-bold text-primary">Médicos</h1>
-        <button
-          className="ml-auto flex gap-2 rounded-lg bg-green-500 px-4 py-2"
-          onClick={onOpen}
-        >
-          <span className="text-sm text-white">Novo</span>
-          <AiOutlinePlus className="text-white" size="1.25rem" />
-        </button>
+        {role === Roles.Admin && (
+          <button
+            className="ml-auto flex gap-2 rounded-lg bg-green-500 px-4 py-2"
+            onClick={onOpen}
+          >
+            <span className="text-sm text-white">Novo</span>
+            <AiOutlinePlus className="text-white" size="1.25rem" />
+          </button>
+        )}
       </div>
       {doctors.length > 0 ? (
         doctors.map((doctor) => {
           return (
             <DoctorCard
               key={doctor.id}
+              role={role}
               doctor={doctor}
               doctors={doctors}
               mutate={mutate}
