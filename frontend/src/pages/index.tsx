@@ -6,12 +6,11 @@ import { Calendar, Messages, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useCustomQuery } from "@/hooks/useCustomQuery";
-import {Button, Skeleton, useDisclosure} from "@chakra-ui/react";
+import { Button, Skeleton, useDisclosure } from "@chakra-ui/react";
 import { IAppointment } from "@/types/appointment";
 import { useRouter } from "next/router";
 import { BsFillCalendarPlusFill } from "react-icons/bs";
-import CreateAppointment from "@/components/appointments/CreateAppointment"
-
+import CreateAppointment from "@/components/appointments/CreateAppointment";
 
 const Home: NextPageWithLayout = () => {
   moment.locale("pt-br");
@@ -50,13 +49,13 @@ const Home: NextPageWithLayout = () => {
         <title>Health Hub</title>
       </Head>
       {appointments && (
-          <CreateAppointment
+        <CreateAppointment
           isOpen={isOpen}
           onClose={onClose}
           appointments={appointments}
           mutate={mutate}
-        />)
-      }
+        />
+      )}
       <main className="flex flex-col p-8">
         <div className="flex flex-col gap-4 rounded-lg bg-white p-8 shadow-lg">
           <div className="flex flex-wrap items-center justify-between">
@@ -68,7 +67,6 @@ const Home: NextPageWithLayout = () => {
             >
               Nova Consulta{" "}
             </Button>
-
           </div>
           <div className="h-[70vh]">
             {appointments ? (

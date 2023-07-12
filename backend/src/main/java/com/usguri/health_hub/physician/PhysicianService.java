@@ -11,12 +11,23 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
+/**
+ * Classe responsável por fornecer serviços relacionados aos médicos. @Author: Bruno Aguiar
+ * (Bacs) @Version: 1.0 @Since: 2023-07-01
+ */
 @Service
 @RequiredArgsConstructor
 public class PhysicianService {
   private final PhysicianRepository physicianRepository;
   private final AppointmentRepository appointmentRepository;
 
+  /**
+   * Retorna uma lista de médicos com base em uma especialidade opcional e/ou nome opcional.
+   *
+   * @param specialty (opcional) - Especialidade médica.
+   * @param name (opcional) - Nome do médico.
+   * @return Lista de médicos encontrados.
+   */
   public List<Physician> getPhysicians(Optional<Specialty> specialty, Optional<String> name) {
     Physician phy =
         Physician.builder().specialty(specialty.orElse(null)).name(name.orElse(null)).build();
@@ -30,6 +41,13 @@ public class PhysicianService {
     return this.physicianRepository.findAll(probe);
   }
 
+  /**
+   * Retorna um médico com base no ID fornecido.
+   *
+   * @param id ID do médico.
+   * @return O médico encontrado.
+   * @throws EntityNotFoundException se o médico com o ID fornecido não for encontrado.
+   */
   private Physician findPhysicianById(Long id) {
     return this.physicianRepository
         .findById(id)
@@ -37,6 +55,13 @@ public class PhysicianService {
             () -> new EntityNotFoundException("Physician with 'id':" + id + " not found."));
   }
 
+  /**
+   * Adiciona um novo médico.
+   *
+   * @param physician Dados do médico a ser adicionado.
+   * @return O médico adicionado.
+   * @throws IllegalStateException se o e-mail do médico já estiver em uso.
+   */
   public Physician addNewPhysician(Physician physician) {
 
     Optional<Physician> physicianOptional = physicianRepository.findByEmail(physician.getEmail());
@@ -46,6 +71,12 @@ public class PhysicianService {
     return physicianRepository.save(physician);
   }
 
+  /**
+   * Exclui um médico com base no ID fornecido.
+   *
+   * @param physicianId ID do médico a ser excluído.
+   * @throws IllegalStateException se o médico com o ID fornecido não existir.
+   */
   @Transactional
   public void deletePhysician(Long physicianId) {
     boolean exists = physicianRepository.existsById(physicianId);
@@ -56,6 +87,14 @@ public class PhysicianService {
     physicianRepository.deleteById(physicianId);
   }
 
+  /**
+   * Atualiza os dados de um médico com base no ID fornecido.
+   *
+   * @param dto Dados atualizados do médico.
+   * @param physicianId ID do médico a ser atualizado.
+   * @return O médico atualizado.
+   * @throws EntityExistsException se o e-mail atualizado do médico já estiver em uso.
+   */
   @Transactional
   public Physician updatePhysician(UpdatePhysicianDTO dto, Long physicianId) {
     Physician original = findPhysicianById(physicianId);

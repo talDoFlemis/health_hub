@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Head from 'next/head'
 import DashboardLayout from '@/layouts/DashboardLayout'
 import type { NextPageWithLayout } from './_app'
@@ -419,7 +420,7 @@ const Appointments: NextPageWithLayout = () => {
 }
 
 Appointments.getLayout = function getLayout(page: ReactElement) {
-    return <DashboardLayout>{page}</DashboardLayout>
-}
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
 
-export default Appointments
+export default Appointments;
