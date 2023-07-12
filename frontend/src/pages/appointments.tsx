@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import Head from 'next/head'
 import DashboardLayout from '@/layouts/DashboardLayout'
 import type { NextPageWithLayout } from './_app'
@@ -23,6 +22,7 @@ import {IPatient} from "@/types/patient";
 import {IPhysician} from "@/types/physician";
 import {IAppointment} from "@/types/appointment";
 import {API_URL, CLIENT_SPECIALITES} from "@/utils/constants";
+import AppointmentList from "@/components/appointments/AppointmentList";
 import {AiOutlinePlus} from "react-icons/ai";
 import {useRouter} from "next/router";
 import {
@@ -164,6 +164,8 @@ const Appointments: NextPageWithLayout = () => {
     ).toDate(),
     end: moment().toDate()
   }
+  setValue("between.start", DefaultDateSearch.start);
+  setValue("between.end", DefaultDateSearch.end);
 
   const dateISOStringParams = (start?: Date, end?: Date) => "?" +
     `start=${
@@ -363,7 +365,7 @@ const Appointments: NextPageWithLayout = () => {
               <FormLabel className="text-description/70" mb={1}>
                 Inicio: {moment(getValues("between.start")).fromNow()}
                 <Input
-                  defaultValue={DefaultDateSearch.start.toISOString().split("T")[0]}
+                  // defaultValue={DefaultDateSearch.start.toISOString().split("T")[0]}
                  placeholder="Selecione a data de inicio do intervalo"
                  size="md"
                  type="date"
@@ -375,7 +377,7 @@ const Appointments: NextPageWithLayout = () => {
               <FormLabel className="text-description/70" mb={1}>
                 Final: {moment(getValues("between.end")).fromNow()}
                 <Input
-                  defaultValue={DefaultDateSearch.end.toISOString().split("T")[0]}
+                  // defaultValue={DefaultDateSearch.end.toISOString().split("T")[0]}
                   placeholder="Selecione a data do final do intervalo"
                   size="md"
                   type="date"
@@ -396,24 +398,8 @@ const Appointments: NextPageWithLayout = () => {
 
 
 
-      <div className={"grid w-full gap-2 rounded-lg bg-white px-4 py-4 shadow-lg lg:grid-cols-2"}>
-        <div className="flex items-center lg:col-span-full">
-          <h1 className="mb-4 text-5xl font-bold text-primary">Consultas</h1>
-        </div>
-          {appointmentsQuery && appointmentsQuery.length > 0 ? (
-            appointmentsQuery.map((appointment) => {
-              return (
-                <AppointmentCard
-                  {...appointment}
-                  key={appointment.id}
-                />
-              );
-            })
-          ) : (
-              <span className="py-4 px-2 text-description/70 text-xl">
-                Nenhuma Consulta Encontrada
-              </span>
-            )}
+      <div className={"flex flex-column w-full rounded-lg bg-white px-4 py-4 shadow-lg"}>
+        <AppointmentList appointments={appointmentsQuery?? [] as IAppointment[]}/>
       </div>
     </main>
   </>)
