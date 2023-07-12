@@ -164,8 +164,7 @@ const Appointments: NextPageWithLayout = () => {
     ).toDate(),
     end: moment().toDate()
   }
-  setValue("between.start", DefaultDateSearch.start);
-  setValue("between.end", DefaultDateSearch.end);
+  
 
   const dateISOStringParams = (start?: Date, end?: Date) => "?" +
     `start=${
