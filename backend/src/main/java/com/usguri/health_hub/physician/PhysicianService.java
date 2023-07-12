@@ -12,12 +12,9 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 /**
-   * Classe responsável por fornecer serviços relacionados aos médicos.
-   * @Author: Bruno Aguiar (Bacs)
-   * @Version: 1.0
-   * @Since: 2023-07-01
-   */
-
+ * Classe responsável por fornecer serviços relacionados aos médicos. @Author: Bruno Aguiar
+ * (Bacs) @Version: 1.0 @Since: 2023-07-01
+ */
 @Service
 @RequiredArgsConstructor
 public class PhysicianService {
@@ -30,9 +27,7 @@ public class PhysicianService {
    * @param specialty (opcional) - Especialidade médica.
    * @param name (opcional) - Nome do médico.
    * @return Lista de médicos encontrados.
-   *
    */
-
   public List<Physician> getPhysicians(Optional<Specialty> specialty, Optional<String> name) {
     Physician phy =
         Physician.builder().specialty(specialty.orElse(null)).name(name.orElse(null)).build();

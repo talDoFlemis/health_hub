@@ -15,14 +15,11 @@ import org.springframework.web.bind.annotation.*;
  * @version 1.0
  * @since 2023-07-01
  */
-
-
 @RestController
 @RequestMapping(path = "${apiPrefix}/physician")
 @RequiredArgsConstructor
 public class PhysicianController {
   private final PhysicianService physicianService;
-
 
   /**
    * Retorna a lista de médicos com base em parâmetros opcionais.
@@ -30,7 +27,6 @@ public class PhysicianController {
    * @param specialty (opcional) - Especialidade médica.
    * @param name (opcional) - Nome do médico.
    * @return Lista de médicos encontrados.
-   *
    */
   @GetMapping
   @PreAuthorize(value = "hasAnyRole('ADMIN', 'ATTENDANT')")
@@ -38,7 +34,6 @@ public class PhysicianController {
       @RequestParam Optional<Specialty> specialty, @RequestParam Optional<String> name) {
     return physicianService.getPhysicians(specialty, name);
   }
-
 
   /**
    * Registra um novo médico.
@@ -57,9 +52,7 @@ public class PhysicianController {
    * Exclui um médico com base no ID fornecido.
    *
    * @param physicianId ID do médico a ser excluído.
-   *
    */
-
   @DeleteMapping(path = "{physicianId}")
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize(value = "hasAnyRole('ADMIN')")
@@ -74,7 +67,6 @@ public class PhysicianController {
    * @param physicianId ID do médico a ser atualizado.
    * @return O médico atualizado.
    */
-
   @PatchMapping(path = "{physicianId}")
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize(value = "hasAnyRole('ADMIN')")
