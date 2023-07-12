@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { withAuth } from "next-auth/middleware";
 import { Roles } from "./utils/constants";
 
+// Middleware utilizado para garantir que os recursos da aplicação só possam ser
+// utilizados por usuários cadastrados, ou seja, os quais possuem tokens de accesso
+// válidos.
 export default withAuth(
   function middleware(req) {
     const { nextUrl, nextauth } = req;

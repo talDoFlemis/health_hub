@@ -1,4 +1,7 @@
+// Variaveis e enums utilizados por vários arquivos no projeto.
+
 export const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export enum Roles {
   Admin = "ADMIN",
   Attendant = "ATTENDANT",
