@@ -1,8 +1,10 @@
 package com.usguri.health_hub.appointment;
 
 import jakarta.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,12 +35,14 @@ public class AppointmentController {
   /**
    * Obtém a lista de todas as consultas médicas dentro de um determinado período.
    *
-   * @param dates O objeto que contém as datas de início e fim do período.
+   * @param start O objeto que contém as datas de início e fim do período.
    * @return A lista de todas as consultas médicas dentro do período especificado.
    */
   @GetMapping("/between")
-  public List<Appointment> getAllBetween(@Valid @RequestBody BetweenDatesDTO dates) {
-    return this.appointmentService.getAllBetween(dates);
+  public List<Appointment> getAllBetween(
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+    return this.appointmentService.getAllBetween(start, end);
   }
 
   /**
@@ -56,14 +60,16 @@ public class AppointmentController {
    * Obtém a lista de todas as consultas médicas de um paciente específico dentro de um determinado
    * período.
    *
-   * @param dates O objeto que contém as datas de início e fim do período.
+   * @param start O objeto que contém as datas de início e fim do período.
    * @param id O ID do paciente.
    * @return A lista de todas as consultas médicas do paciente dentro do período especificado.
    */
   @GetMapping("/patient/between/{id}")
   public List<Appointment> getAllByPatientBetween(
-      @Valid @RequestBody BetweenDatesDTO dates, @PathVariable Long id) {
-    return this.appointmentService.getAllByPatientBetween(dates, id);
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
+      @PathVariable Long id) {
+    return this.appointmentService.getAllByPatientBetween(start, end, id);
   }
 
   /**
@@ -81,14 +87,16 @@ public class AppointmentController {
    * Obtém a lista de todas as consultas médicas de um médico específico dentro de um determinado
    * período.
    *
-   * @param dates O objeto que contém as datas de início e fim do período.
+   * @param start O objeto que contém as datas de início e fim do período.
    * @param id O ID do médico.
    * @return A lista de todas as consultas médicas do médico dentro do período especificado.
    */
   @GetMapping("/physician/between/{id}")
   public List<Appointment> getAllByPhysicianBetween(
-      @Valid @RequestBody BetweenDatesDTO dates, @PathVariable Long id) {
-    return this.appointmentService.getAllByPhysicianBetween(dates, id);
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
+      @PathVariable Long id) {
+    return this.appointmentService.getAllByPhysicianBetween(start, end, id);
   }
 
   /**
