@@ -97,6 +97,14 @@ public class SeedDatabase implements CommandLineRunner {
     boolean db_empty = db_empty();
     if (patientRepository.count() == 0) {
       List<Patient> patients = getListFromCSV(Patient.class, "src/main/resources/patients.csv");
+      Patient tubias =
+          Patient.builder()
+              .firstname("Tubias")
+              .lastname("Nobre")
+              .dbo(java.time.LocalDate.parse("1999-01-01"))
+              .email("tubias@healthhub.com")
+              .build();
+      patients.add(tubias);
       patientRepository.saveAll(patients);
     }
     if (physicianRepository.count() == 0) {
@@ -107,6 +115,12 @@ public class SeedDatabase implements CommandLineRunner {
     if (db_empty) {
       List<AppointmentRaw> appointmentRaws =
           getListFromCSV(AppointmentRaw.class, "src/main/resources/appointments.csv");
+      AppointmentRaw tubiasAppointment = new AppointmentRaw();
+      tubiasAppointment.setId(101L);
+      tubiasAppointment.setPatient_id(31L);
+      tubiasAppointment.setPhysician_id(1L);
+      tubiasAppointment.setTime(java.time.LocalDateTime.parse("2021-07-04T10:00:00"));
+      appointmentRaws.add(tubiasAppointment);
       List<Appointment> appointments = new ArrayList<>();
       appointmentRaws.forEach(
           a -> {
@@ -152,13 +166,6 @@ public class SeedDatabase implements CommandLineRunner {
                   Role.PATIENT,
                   Collections.emptyList()));
       userRepository.saveAll(users);
-      patientRepository.save(
-          Patient.builder()
-              .firstname("Tubias")
-              .lastname("Nobre")
-              .dbo(java.time.LocalDate.parse("1999-01-01"))
-              .email("tubias@healthhub.com")
-              .build());
     }
     System.out.println("Patient count " + patientRepository.count());
     System.out.println("Physician count " + physicianRepository.count());
